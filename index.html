@@ -13,11 +13,12 @@
     /* 基礎設定與強制防止左右晃動 (防破版裝甲) - 加上全版背景設定 */
     html, body { 
         font-family: 'Inter', sans-serif; 
+        /* 替換原本的 background-color，改為全版背景圖片 */
         background-image: url('https://drive.google.com/uc?export=view&id=13vLMiDFzhmderx31P6UvMuUT4NONCdps');
         background-size: cover;
         background-position: center;
-        background-attachment: fixed;
         background-repeat: no-repeat;
+        /* background-attachment: fixed; */ /* 視情況可選，讓背景固定在視窗，滾動時不隨內容移動，看起來更專業 */
         -webkit-tap-highlight-color: transparent; 
         overflow-x: hidden; 
         width: 100%; 
@@ -78,10 +79,10 @@
     </transition>
 
     <div v-if="currentView === 'login'" class="w-full max-w-md p-8 mt-10 sm:rounded-3xl shadow-2xl glass-panel">
-        <div class="flex justify-center mb-4">
+        <div class="flex justify-center mb-6">
             <img src="https://drive.google.com/uc?export=view&id=1EseT2a2Q0YZjwKdiuSuQQ6n_oNlq3JvB" alt="RubyBrandDesign Logo" class="w-24 h-24 object-contain">
         </div>
-        <p class="text-center text-gray-500 font-bold mb-6 text-sm">RubyBrandDesign電子名片系統後台</p>
+        <p class="text-center text-gray-700 font-bold mb-8 text-sm">RubyBrandDesign電子名片系統後台</p>
         <form @submit.prevent="handleLogin" class="space-y-4">
             <input v-model="loginForm.email" type="email" required placeholder="Email" class="w-full p-4 rounded-xl border outline-none focus:ring-2 focus:ring-pink-400">
             <input v-model="loginForm.password" type="password" required placeholder="密碼" class="w-full p-4 rounded-xl border outline-none focus:ring-2 focus:ring-pink-400">
