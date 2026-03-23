@@ -13,15 +13,17 @@
     /* 基礎設定與強制防止左右晃動 (防破版裝甲) - 加上全版背景設定 */
     html, body { 
         font-family: 'Inter', sans-serif; 
-        /* 替換原本的 background-color，改為全版背景圖片 */
-        background-image: url('https://drive.google.com/uc?export=view&id=13vLMiDFzhmderx31P6UvMuUT4NONCdps');
+        /* 【已優化】替換為最穩定的 Google Drive Thumbnail 網址格式 */
+        background-image: url('https://drive.google.com/thumbnail?id=13vLMiDFzhmderx31P6UvMuUT4NONCdps&sz=w1000');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
-        /* background-attachment: fixed; */ /* 視情況可選，讓背景固定在視窗，滾動時不隨內容移動，看起來更專業 */
+        /* 【已優化】開啟固定視窗，確保背景完美延展不跑位 */
+        background-attachment: fixed; 
         -webkit-tap-highlight-color: transparent; 
         overflow-x: hidden; 
         width: 100%; 
+        min-height: 100vh; /* 【已優化】確保高度至少延展滿整個螢幕 */
         max-width: 100vw; 
     }
     
@@ -80,7 +82,7 @@
 
     <div v-if="currentView === 'login'" class="w-full max-w-md p-8 mt-10 sm:rounded-3xl shadow-2xl glass-panel">
         <div class="flex justify-center mb-6">
-            <img src="https://drive.google.com/uc?export=view&id=1EseT2a2Q0YZjwKdiuSuQQ6n_oNlq3JvB" alt="RubyBrandDesign Logo" class="w-24 h-24 object-contain">
+            <img src="https://drive.google.com/thumbnail?id=1EseT2a2Q0YZjwKdiuSuQQ6n_oNlq3JvB&sz=w1000" alt="RubyBrandDesign Logo" class="w-24 h-24 object-contain">
         </div>
         <p class="text-center text-gray-700 font-bold mb-8 text-sm">RubyBrandDesign電子名片系統後台</p>
         <form @submit.prevent="handleLogin" class="space-y-4">
