@@ -493,7 +493,7 @@
             <div class="p-4 flex gap-3 bg-gray-900">
                 <button @click="closeCropper" class="flex-1 bg-gray-800 text-white font-bold py-3 rounded-xl hover:bg-gray-700 transition">取消</button>
                 <button @click="confirmCropAndUpload" :disabled="isUploading" class="flex-1 bg-pink-500 text-white font-bold py-3 rounded-xl hover:bg-pink-600 flex justify-center items-center gap-2 disabled:opacity-50">
-                    <i v-if="isUploading" class="ph ph-spinner animate-spin"></i> {{ isUploading ? '裁切上傳中...' : '確認裁切' }}
+                    <i v-if="isUploading" class="ph ph-spinner animate-spin"></i> {{ isUploading ? '處理中...' : '確認裁切' }}
                 </button>
             </div>
         </div>
@@ -906,31 +906,66 @@
             isMediaModalOpen.value = true; 
         };
 
+        // 【UX 優化】裁切後：即時顯示 Base64 於前端，並背景上傳
         const confirmCropAndUpload = () => {
             if (!cropperInstance) return;
             isUploading.value = true;
-            const b64 = cropperInstance.getCroppedCanvas({ width: 600, height: 600 }).toDataURL('image/jpeg', 0.85).split(',')[1];
-            uploadToDrive(b64, 'image/jpeg', 'jpg', currentUser.value.profileFolderId, true);
+            
+            // 取得 Base64 完整字串與純資料段
+            const fullBase64 = cropperInstance.getCroppedCanvas({ width: 600, height: 600 }).toDataURL('image/jpeg', 0.85);
+            const b64Data = fullBase64.split(',')[1];
+            
+            // 1. 前端即時顯示 (Optimistic UI)
+            const tempId = 'temp_' + Date.now();
+            const tempImg = { id: tempId, url: fullBase64, name: 'cropped_image.jpg' };
+            profileImagesCache.value.unshift(tempImg);
+            mediaImages.value.unshift(tempImg);
+            
+            profile.value.avatarUrl = fullBase64;
+            
+            showToast('圖片已即時套用！背景上傳雲端中...');
+            closeCropper();
+            isUploading.value = false;
+
+            // 2. 背景同步至雲端
+            uploadToDrive(b64Data, 'image/jpeg', 'jpg', currentUser.value.profileFolderId, tempId, 'avatar', null);
         };
 
+        // 【UX 優化】一般上傳：即時顯示 Base64 於前端，並背景上傳
         const directUpload = (file) => {
-            isUploading.value = true; 
-            showToast('上傳高畫質原圖中...');
             const reader = new FileReader();
             reader.onload = async (e) => {
+                const fullBase64 = e.target.result;
+                const b64Data = fullBase64.split(',')[1];
                 const isSlide = currentUploadContext.value === 'slide';
-                uploadToDrive(
-                    e.target.result.split(',')[1], 
-                    file.type, 
-                    file.name.split('.').pop(), 
-                    isSlide ? currentUser.value.slideFolderId : currentUser.value.profileFolderId, 
-                    false
-                );
+                const folderId = isSlide ? currentUser.value.slideFolderId : currentUser.value.profileFolderId;
+                
+                // 1. 前端即時顯示 (Optimistic UI)
+                const tempId = 'temp_' + Date.now();
+                const tempImg = { id: tempId, url: fullBase64, name: file.name };
+                
+                if (isSlide) {
+                    slideImagesCache.value.unshift(tempImg);
+                    slides.value[currentButtonIndex.value].imageUrl = fullBase64;
+                } else {
+                    profileImagesCache.value.unshift(tempImg);
+                    if (currentUploadContext.value === 'buttonIcon') {
+                        buttons.value[currentButtonIndex.value].iconUrl = fullBase64;
+                    }
+                }
+                mediaImages.value.unshift(tempImg);
+                
+                showToast('圖片已即時套用！背景上傳雲端中...');
+                isMediaModalOpen.value = false; // 立即關閉圖庫視窗
+                
+                // 2. 背景同步至雲端
+                uploadToDrive(b64Data, file.type, file.name.split('.').pop(), folderId, tempId, currentUploadContext.value, currentButtonIndex.value);
             };
             reader.readAsDataURL(file);
         };
 
-        const uploadToDrive = (b64, mimeType, ext, folderId, isCropped) => {
+        // 【UX 優化】處理背景上傳並神不知鬼不覺地替換成真實雲端網址
+        const uploadToDrive = (b64, mimeType, ext, folderId, tempId, context, index) => {
             apiCall({ 
                 action: 'uploadImage', 
                 memberId: currentUser.value.memberId, 
@@ -943,21 +978,33 @@
             })
             .then(res => {
                 if(res.status === 'success') {
-                    showToast('雲端儲存成功！');
-                    const newImg = { id: res.id, url: res.fileUrl, name: res.name };
-                    if (currentUploadContext.value === 'slide') {
-                        slideImagesCache.value.unshift(newImg);
-                    } else {
-                        profileImagesCache.value.unshift(newImg);
+                    // 將暫存的 Base64 替換為真實的 Google Drive 網址
+                    const realUrl = res.fileUrl;
+                    const realId = res.id;
+                    
+                    const swapCacheUrl = (cacheArray) => {
+                        const img = cacheArray.find(i => i.id === tempId);
+                        if (img) { img.id = realId; img.url = realUrl; }
+                    };
+                    
+                    swapCacheUrl(profileImagesCache.value);
+                    swapCacheUrl(slideImagesCache.value);
+                    swapCacheUrl(mediaImages.value);
+                    
+                    // 確保畫面上的圖片如果是剛剛選的暫存圖，要把它換成真實網址 (以利後續儲存)
+                    if (context === 'avatar' && profile.value.avatarUrl.startsWith('data:image')) {
+                        profile.value.avatarUrl = realUrl;
+                    } else if (context === 'buttonIcon' && index !== null && buttons.value[index].iconUrl.startsWith('data:image')) {
+                        buttons.value[index].iconUrl = realUrl;
+                    } else if (context === 'slide' && index !== null && slides.value[index].imageUrl.startsWith('data:image')) {
+                        slides.value[index].imageUrl = realUrl;
                     }
-                    mediaImages.value.unshift(newImg);
-                    if(isCropped) closeCropper();
-                    selectImage(res.fileUrl);
+                    console.log('背景上傳完成，已替換為雲端真實網址');
                 } else {
-                    showToast('上傳異常', 'error');
+                    showToast('圖片雲端備份異常，請重新上傳', 'error');
                 }
-            }).finally(() => { 
-                isUploading.value = false; 
+            }).catch(() => {
+                showToast('背景上傳失敗，請檢查網路', 'error');
             });
         };
 
