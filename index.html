@@ -384,9 +384,18 @@
                                     </div>
 
                                     <transition name="slide-down">
-                                        <div v-if="activePaletteId === 'slideBg_' + slide.id" class="mb-3 bg-white p-3 rounded-xl border shadow-sm">
-                                            <div class="flex justify-between items-center mb-2"><span class="text-[10px] font-bold text-gray-400">卡片背景色</span><div class="relative w-5 h-5 rounded-full cursor-pointer icolor-wheel"><input type="color" v-model="slide.bgColor" class="absolute inset-0 w-full h-full opacity-0"></div></div>
-                                            <div class="color-grid-matrix"><div v-for="(row, rIdx) in colorMatrix" :key="rIdx" class="color-row"><button v-for="c in row" :key="c" @click="slide.bgColor = c" class="color-swatch" :style="{ backgroundColor: c }"></button></div></div>
+                                        <div v-if="activePaletteId === 'slideBg_' + slide.id" class="mb-3 bg-white p-3 rounded-xl border border-gray-200 shadow-sm relative z-10">
+                                            <div class="flex justify-between items-center mb-2">
+                                                <span class="text-[10px] font-bold text-gray-400">自訂卡片背景色</span>
+                                                <div class="relative w-5 h-5 rounded-full cursor-pointer icolor-wheel border border-gray-200">
+                                                    <input type="color" v-model="slide.bgColor" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                                </div>
+                                            </div>
+                                            <div class="color-grid-matrix">
+                                                <div v-for="(row, rIdx) in colorMatrix" :key="rIdx" class="color-row">
+                                                    <button v-for="c in row" :key="c" @click="slide.bgColor = c" class="color-swatch" :class="{'ring-1 ring-gray-800': slide.bgColor === c}" :style="{ backgroundColor: c }"></button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </transition>
 
@@ -417,8 +426,18 @@
                                             </div>
                                             
                                             <transition name="slide-down">
-                                                <div v-if="activePaletteId === 'sBtn_' + slide.id + '_' + bIdx" class="mt-2 bg-gray-50 p-2 rounded-lg border">
-                                                    <div class="color-grid-matrix"><div v-for="(row, rIdx) in colorMatrix" :key="rIdx" class="color-row"><button v-for="c in row" :key="c" @click="sBtn.color = c" class="color-swatch w-5 h-5" :style="{ backgroundColor: c }"></button></div></div>
+                                                <div v-if="activePaletteId === 'sBtn_' + slide.id + '_' + bIdx" class="mt-2 bg-white p-3 rounded-xl border border-gray-200 shadow-sm relative z-10">
+                                                    <div class="flex justify-between items-center mb-2">
+                                                        <span class="text-[10px] font-bold text-gray-400">按鈕底色與滴管</span>
+                                                        <div class="relative w-5 h-5 rounded-full cursor-pointer icolor-wheel border border-gray-200">
+                                                            <input type="color" v-model="sBtn.color" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                                        </div>
+                                                    </div>
+                                                    <div class="color-grid-matrix">
+                                                        <div v-for="(row, rIdx) in colorMatrix" :key="rIdx" class="color-row">
+                                                            <button v-for="c in row" :key="c" @click="sBtn.color = c" class="color-swatch w-5 h-5" :class="{'ring-1 ring-gray-800': sBtn.color === c}" :style="{ backgroundColor: c }"></button>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </transition>
                                         </div>
