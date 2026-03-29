@@ -157,7 +157,7 @@
                 
                 <div class="sticky mockup-phone no-scrollbar transition-all shrink-0" :class="{'hidden lg:flex': mobileViewModeProfile === 'edit'}" style="top: max(96px, calc(50vh - 350px));">
                     <div class="mockup-notch"></div>
-                    <div class="pt-12 px-6 pb-10 flex flex-col items-center flex-1 transition-colors duration-300" :style="{ backgroundColor: profile.bgColor }">
+                    <div class="pt-12 px-6 pb-10 flex flex-col items-center flex-1 transition-colors duration-300 min-h-0" :style="{ backgroundColor: profile.bgColor }">
                         
                         <div class="relative mt-6 mb-4">
                             <img :src="profile.avatarUrl || 'https://via.placeholder.com/150'" class="w-28 h-28 rounded-full object-cover border-4 border-white shadow-lg bg-gray-100">
@@ -171,7 +171,7 @@
                             </div>
                         </div>
 
-                        <div class="w-full mt-3 space-y-3 flex-1 overflow-y-auto no-scrollbar pb-4">
+                        <div class="w-full mt-3 space-y-3 flex-1 overflow-y-auto no-scrollbar pb-4 min-h-0">
                             <div v-for="btn in buttons" :key="btn.id" 
                                class="w-full rounded-2xl shadow-sm flex items-center gap-3 px-3 py-3 border border-white/50 transition cursor-default" 
                                :style="{ backgroundColor: btn.color || '#ffffff' }">
@@ -305,26 +305,31 @@
                 <div class="sticky mockup-line-chat no-scrollbar transition-all shrink-0" :class="{'hidden lg:flex': mobileViewModeSlide === 'edit'}" style="top: max(96px, calc(50vh - 350px));">
                     <div class="mockup-notch"></div>
                     <div class="line-header"><i class="ph ph-caret-left text-xl"></i> RubyBrandDesign</div>
-                    <div class="flex-1 overflow-y-auto no-scrollbar pb-6 flex flex-col justify-end">
-                        <div v-if="slides.length === 0" class="text-center text-white/50 text-sm mt-10">尚無輪播卡片，請從編輯區新增</div>
+                    
+                    <div class="flex-1 overflow-y-auto no-scrollbar flex flex-col min-h-0">
+                        <div class="flex-1 min-h-0"></div>
                         
-                        <div class="line-carousel-container no-scrollbar items-stretch pb-6">
+                        <div class="w-full shrink-0 flex flex-col pb-6">
+                            <div v-if="slides.length === 0" class="text-center text-white/50 text-sm mt-10">尚無輪播卡片，請從編輯區新增</div>
                             
-                            <div v-for="slide in slides" :key="slide.id" class="line-card flex flex-col shrink-0" :style="{ backgroundColor: slide.bgColor || '#ffffff' }">
-                                <div class="relative w-full aspect-[2/3] bg-gray-100 overflow-hidden shrink-0 border-b border-gray-100/50">
-                                    <img v-if="slide.imageUrl" :src="slide.imageUrl" class="absolute inset-0 w-full h-full object-cover object-center">
-                                    <div v-else class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 bg-gray-200">
-                                        <i class="ph ph-image text-4xl mb-2"></i>
-                                        <span class="text-[10px] font-bold px-4 text-center">固定比例滿版區 (4:6)<br>按鈕將緊貼於此區域下方</span>
+                            <div v-else class="line-carousel-container no-scrollbar items-stretch">
+                                
+                                <div v-for="slide in slides" :key="slide.id" class="line-card flex flex-col shrink-0" :style="{ backgroundColor: slide.bgColor || '#ffffff' }">
+                                    <div class="relative w-full aspect-[2/3] bg-gray-100 overflow-hidden shrink-0 border-b border-gray-100/50">
+                                        <img v-if="slide.imageUrl" :src="slide.imageUrl" class="absolute inset-0 w-full h-full object-cover object-center">
+                                        <div v-else class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 bg-gray-200">
+                                            <i class="ph ph-image text-4xl mb-2"></i>
+                                            <span class="text-[10px] font-bold px-4 text-center">固定比例滿版區 (4:6)<br>按鈕將緊貼於此區域下方</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col gap-2 p-3 flex-1" :style="{ backgroundColor: slide.bgColor || '#ffffff' }">
+                                        <a v-for="(sBtn, bIdx) in slide.buttons" :key="bIdx" :href="buildFinalLink(sBtn.type, sBtn.linkValue)" target="_blank" class="rounded-xl p-3 text-center text-[15px] font-bold hover:opacity-80 transition" :style="{ backgroundColor: sBtn.color || '#6C0B22', color: slide.buttonTextColor || '#ffffff', fontFamily: getFontFamily(slide.buttonFont) }">
+                                            {{ sBtn.title || '按鈕文字' }}
+                                        </a>
                                     </div>
                                 </div>
-                                <div class="flex flex-col gap-2 p-3 flex-1" :style="{ backgroundColor: slide.bgColor || '#ffffff' }">
-                                    <a v-for="(sBtn, bIdx) in slide.buttons" :key="bIdx" :href="buildFinalLink(sBtn.type, sBtn.linkValue)" target="_blank" class="rounded-xl p-3 text-center text-[15px] font-bold hover:opacity-80 transition" :style="{ backgroundColor: sBtn.color || '#6C0B22', color: slide.buttonTextColor || '#ffffff', fontFamily: getFontFamily(slide.buttonFont) }">
-                                        {{ sBtn.title || '按鈕文字' }}
-                                    </a>
-                                </div>
+                                
                             </div>
-                            
                         </div>
                     </div>
                 </div>
