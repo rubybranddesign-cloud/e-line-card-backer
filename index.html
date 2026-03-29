@@ -33,9 +33,14 @@
     .glass-panel { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.5); }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    .mockup-phone { width: 340px; min-height: 700px; border: 12px solid #1f2937; border-radius: 40px; overflow: hidden; background: #fff; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); margin: 0 auto; display: flex; flex-direction: column;}
+    
+    /* 【優化 UX】將 min-height 調整為絕對 height: 700px，確保畫面滾動時不會導致外框撐大，完美維持中央置中 */
+    .mockup-phone { width: 340px; height: 700px; border: 12px solid #1f2937; border-radius: 40px; overflow: hidden; background: #fff; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); margin: 0 auto; display: flex; flex-direction: column;}
     .mockup-notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 120px; height: 24px; background: #1f2937; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; z-index: 10; }
-    .mockup-line-chat { width: 340px; min-height: 700px; border: 12px solid #1f2937; border-radius: 40px; overflow: hidden; background: #749cbd; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); margin: 0 auto; display: flex; flex-direction: column;}
+    
+    /* 【優化 UX】同上，改為絕對 height: 700px */
+    .mockup-line-chat { width: 340px; height: 700px; border: 12px solid #1f2937; border-radius: 40px; overflow: hidden; background: #749cbd; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); margin: 0 auto; display: flex; flex-direction: column;}
+    
     .line-header { background: #262626; color: white; padding: 35px 15px 15px 15px; font-weight: bold; display: flex; align-items: center; gap: 10px; font-size: 15px;}
     .line-carousel-container { display: flex; gap: 10px; overflow-x: auto; padding: 20px 15px; scroll-snap-type: x mandatory;}
     .line-card { min-width: 280px; max-width: 280px; background: white; border-radius: 16px; overflow: hidden; scroll-snap-align: center; box-shadow: 0 6px 16px rgba(0,0,0,0.15); display: flex; flex-direction: column;}
@@ -134,7 +139,7 @@
 
             <div class="flex flex-col lg:flex-row gap-8 justify-center items-start w-full min-w-0">
                 
-                <div class="sticky top-24 mockup-phone no-scrollbar transition-all shrink-0" :class="{'hidden lg:flex': mobileViewModeProfile === 'edit'}">
+                <div class="sticky top-[max(96px,calc(50vh-350px))] mockup-phone no-scrollbar transition-all shrink-0" :class="{'hidden lg:flex': mobileViewModeProfile === 'edit'}">
                     <div class="mockup-notch"></div>
                     <div class="pt-12 px-6 pb-10 flex flex-col items-center flex-1 transition-colors duration-300" :style="{ backgroundColor: profile.bgColor }">
                         
@@ -281,7 +286,7 @@
 
             <div class="flex flex-col lg:flex-row gap-8 justify-center items-start w-full min-w-0">
                 
-                <div class="sticky top-24 mockup-line-chat no-scrollbar transition-all shrink-0" :class="{'hidden lg:flex': mobileViewModeSlide === 'edit'}">
+                <div class="sticky top-[max(96px,calc(50vh-350px))] mockup-line-chat no-scrollbar transition-all shrink-0" :class="{'hidden lg:flex': mobileViewModeSlide === 'edit'}">
                     <div class="mockup-notch"></div>
                     <div class="line-header"><i class="ph ph-caret-left text-xl"></i> RubyBrandDesign</div>
                     <div class="flex-1 overflow-y-auto no-scrollbar pb-6 flex flex-col justify-end">
