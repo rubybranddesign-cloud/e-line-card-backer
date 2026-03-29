@@ -92,10 +92,25 @@
         <p class="text-center text-gray-700 font-bold mb-8 text-sm">RubyBrandDesign電子名片系統後台</p>
         <form @submit.prevent="handleLogin" class="space-y-4">
             <input v-model="loginForm.email" type="email" required placeholder="Email" class="w-full p-4 rounded-xl border outline-none focus:ring-2 focus:ring-pink-400">
-            <input v-model="loginForm.password" type="password" required placeholder="密碼" class="w-full p-4 rounded-xl border outline-none focus:ring-2 focus:ring-pink-400">
+            <div class="relative">
+                <input v-model="loginForm.password" type="password" required placeholder="密碼" class="w-full p-4 rounded-xl border outline-none focus:ring-2 focus:ring-pink-400">
+                <div class="flex justify-end mt-2 px-1">
+                    <a href="#" @click.prevent="currentView = 'forgotPassword'" class="text-xs text-gray-500 hover:text-pink-500 font-bold transition">忘記密碼？</a>
+                </div>
+            </div>
             <button class="w-full bg-pink-500 hover:bg-pink-600 transition text-white p-4 rounded-xl font-bold flex justify-center items-center gap-2"><i v-if="isLoading" class="ph ph-spinner animate-spin"></i> {{ isLoading ? '載入中...' : '登入系統' }}</button>
         </form>
         <div class="mt-6 text-center text-sm">還沒有帳號？ <a href="#" @click.prevent="currentView = 'register'" class="text-pink-600 font-bold hover:underline">立即申請開通</a></div>
+    </div>
+
+    <div v-if="currentView === 'forgotPassword'" class="w-full max-w-md p-8 mt-10 sm:rounded-3xl shadow-2xl glass-panel">
+        <h1 class="text-3xl font-black text-center text-gray-900 mb-4">忘記密碼</h1>
+        <p class="text-center text-sm text-gray-500 mb-8 font-bold">請輸入您的註冊信箱，我們將為您寄送專屬密碼重設信件。</p>
+        <form @submit.prevent="handleForgotPassword" class="space-y-4">
+            <input v-model="forgotForm.email" type="email" required placeholder="聯絡信箱 (Email)" class="w-full p-4 rounded-xl border outline-none focus:ring-2 focus:ring-pink-400">
+            <button type="submit" :disabled="isLoading" class="w-full bg-gray-900 hover:bg-black transition text-white p-4 rounded-xl font-bold flex justify-center items-center gap-2"><i v-if="isLoading" class="ph ph-spinner animate-spin"></i> 發送重設信件</button>
+        </form>
+        <div class="mt-6 text-center text-sm"><a href="#" @click.prevent="currentView = 'login'" class="text-pink-600 font-bold hover:underline">返回登入</a></div>
     </div>
 
     <div v-if="currentView === 'register'" class="w-full max-w-md p-8 mt-10 sm:rounded-3xl shadow-2xl glass-panel">
@@ -516,6 +531,7 @@
         
         const loginForm = ref({ email: '', password: '' });
         const regForm = ref({ name: '', email: '' });
+        const forgotForm = ref({ email: '' }); // 【新增】忘記密碼表單
         
         const isLoading = ref(false);
         const isFetchingData = ref(false);
@@ -727,6 +743,25 @@
             }
         };
 
+        // 【新增】發送忘記密碼 API 請求
+        const handleForgotPassword = async () => {
+            isLoading.value = true;
+            try {
+                const res = await apiCall({ action: 'forgotPassword', email: forgotForm.value.email });
+                if (res.status === 'success') {
+                    showToast('重設密碼信件已寄出，請查收！');
+                    forgotForm.value.email = '';
+                    currentView.value = 'login';
+                } else {
+                    showToast(res.message, 'error');
+                }
+            } catch (e) {
+                showToast('伺服器無回應', 'error');
+            } finally {
+                isLoading.value = false;
+            }
+        };
+
         const handleRegister = async () => {
             isLoading.value = true;
             try {
@@ -906,16 +941,13 @@
             isMediaModalOpen.value = true; 
         };
 
-        // 【UX 優化】裁切後：即時顯示 Base64 於前端，並背景上傳
         const confirmCropAndUpload = () => {
             if (!cropperInstance) return;
             isUploading.value = true;
             
-            // 取得 Base64 完整字串與純資料段
             const fullBase64 = cropperInstance.getCroppedCanvas({ width: 600, height: 600 }).toDataURL('image/jpeg', 0.85);
             const b64Data = fullBase64.split(',')[1];
             
-            // 1. 前端即時顯示 (Optimistic UI)
             const tempId = 'temp_' + Date.now();
             const tempImg = { id: tempId, url: fullBase64, name: 'cropped_image.jpg' };
             profileImagesCache.value.unshift(tempImg);
@@ -927,11 +959,9 @@
             closeCropper();
             isUploading.value = false;
 
-            // 2. 背景同步至雲端
             uploadToDrive(b64Data, 'image/jpeg', 'jpg', currentUser.value.profileFolderId, tempId, 'avatar', null);
         };
 
-        // 【UX 優化】一般上傳：即時顯示 Base64 於前端，並背景上傳
         const directUpload = (file) => {
             const reader = new FileReader();
             reader.onload = async (e) => {
@@ -940,7 +970,6 @@
                 const isSlide = currentUploadContext.value === 'slide';
                 const folderId = isSlide ? currentUser.value.slideFolderId : currentUser.value.profileFolderId;
                 
-                // 1. 前端即時顯示 (Optimistic UI)
                 const tempId = 'temp_' + Date.now();
                 const tempImg = { id: tempId, url: fullBase64, name: file.name };
                 
@@ -956,15 +985,13 @@
                 mediaImages.value.unshift(tempImg);
                 
                 showToast('圖片已即時套用！背景上傳雲端中...');
-                isMediaModalOpen.value = false; // 立即關閉圖庫視窗
+                isMediaModalOpen.value = false;
                 
-                // 2. 背景同步至雲端
                 uploadToDrive(b64Data, file.type, file.name.split('.').pop(), folderId, tempId, currentUploadContext.value, currentButtonIndex.value);
             };
             reader.readAsDataURL(file);
         };
 
-        // 【UX 優化】處理背景上傳並神不知鬼不覺地替換成真實雲端網址
         const uploadToDrive = (b64, mimeType, ext, folderId, tempId, context, index) => {
             apiCall({ 
                 action: 'uploadImage', 
@@ -978,7 +1005,6 @@
             })
             .then(res => {
                 if(res.status === 'success') {
-                    // 將暫存的 Base64 替換為真實的 Google Drive 網址
                     const realUrl = res.fileUrl;
                     const realId = res.id;
                     
@@ -991,7 +1017,6 @@
                     swapCacheUrl(slideImagesCache.value);
                     swapCacheUrl(mediaImages.value);
                     
-                    // 確保畫面上的圖片如果是剛剛選的暫存圖，要把它換成真實網址 (以利後續儲存)
                     if (context === 'avatar' && profile.value.avatarUrl.startsWith('data:image')) {
                         profile.value.avatarUrl = realUrl;
                     } else if (context === 'buttonIcon' && index !== null && buttons.value[index].iconUrl.startsWith('data:image')) {
@@ -1058,11 +1083,11 @@
         };
 
         return { 
-          currentView, activeTab, currentUser, loginForm, regForm, isRegSuccess, colorMatrix,
+          currentView, activeTab, currentUser, loginForm, regForm, forgotForm, isRegSuccess, colorMatrix,
           buttonTypes, getPlaceholder, buildFinalLink, getFontFamily, handleTypeChange,
           mobileViewModeProfile, mobileViewModeSlide, activePaletteId, togglePalette,
           isLoading, isFetchingData, isSaving, toast, confirmModal, requestDelete, executeConfirm,
-          handleLogin, handleRegister, logout, saveAllData, saveSlidesData, autoResize,
+          handleLogin, handleRegister, handleForgotPassword, logout, saveAllData, saveSlidesData, autoResize,
           profile, buttons, slides, addNewButton, addNewSlide, moveItem, 
           isMediaModalOpen, mediaImages, isLoadingImages, openMediaLibrary, closeMediaLibrary, selectImage,
           handleFileSelect, isCropModalOpen, isUploading, closeCropper, confirmCropAndUpload,
