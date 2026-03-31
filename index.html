@@ -64,6 +64,8 @@
 
   <div id="app" v-cloak class="min-h-screen w-full overflow-x-hidden flex flex-col items-center justify-start sm:p-4 relative">
     
+    <div v-if="activePaletteId" @click="activePaletteId = null" class="fixed inset-0 z-40 cursor-default"></div>
+
     <transition name="toast">
         <div v-if="toast.show" class="fixed top-5 left-1/2 z-[100] px-6 py-3 rounded-full shadow-xl font-bold text-white flex items-center gap-2" :class="toast.type === 'success' ? 'bg-gray-900' : 'bg-red-500'">
             <i :class="toast.type === 'success' ? 'ph-fill ph-check-circle text-green-400' : 'ph-fill ph-warning-circle text-white'" class="text-xl"></i> {{ toast.message }}
@@ -149,15 +151,25 @@
                 
                 <div class="sticky mockup-phone no-scrollbar transition-all shrink-0" :class="{'hidden lg:flex': mobileViewModeProfile === 'edit'}" style="top: max(96px, calc(50vh - 350px));">
                     <div class="mockup-notch"></div>
-                    <div class="preview-body-container pt-12 px-6 pb-10 flex flex-col items-center flex-1 transition-all duration-500 relative bg-cover bg-center overflow-y-auto"
-                         :style="{ backgroundColor: profile.bgColor, backgroundImage: profile.bgImageUrl ? `url(${profile.bgImageUrl})` : 'none' }">
+                    
+                    <div class="preview-body-container flex flex-col flex-1 transition-all duration-500 relative overflow-y-auto w-full no-scrollbar"
+                         :style="{ backgroundColor: profile.bgColor }">
                         
-                        <div class="absolute inset-0 bg-black/0 z-0"></div>
+                        <div v-if="profile.bgImageUrl" class="relative w-full aspect-[4/5] shrink-0 bg-cover bg-center flex flex-col justify-end items-center pb-[2px]" :style="{ backgroundImage: `url(${profile.bgImageUrl})` }">
+                            <div class="absolute bottom-0 left-0 w-full h-1/2" :style="{ background: `linear-gradient(to top, ${profile.bgColor} 0%, transparent 100%)` }"></div>
+                            
+                            <div class="relative z-10 mb-3">
+                                <img :src="profile.avatarUrl || 'https://via.placeholder.com/150'" class="w-[110px] h-[110px] rounded-full object-cover border-2 border-white/50 shadow-md bg-gray-100">
+                            </div>
+                        </div>
 
-                        <div class="relative z-10 w-full flex flex-col items-center mt-2">
+                        <div v-else class="relative z-10 w-full flex flex-col items-center mt-[100px] shrink-0">
                             <div class="relative mb-3">
                                 <img :src="profile.avatarUrl || 'https://via.placeholder.com/150'" class="w-[110px] h-[110px] rounded-full object-cover border-2 border-white/50 shadow-md bg-gray-100">
                             </div>
+                        </div>
+
+                        <div class="relative z-10 w-full flex flex-col items-center px-6 pb-10">
                             
                             <div class="text-2xl font-black text-center mb-1 tracking-wider" :style="{ color: profile.textColor }">{{ profile.name || '顯示名稱' }}</div>
                             <div class="text-[13px] text-center whitespace-pre-wrap leading-relaxed w-full break-words opacity-90" :style="{ color: profile.textColor }">{{ profile.bio || '尚未填寫自介' }}</div>
@@ -174,12 +186,13 @@
                             </div>
 
                             <div class="w-full mt-5 space-y-3 pb-6">
-                                <div v-for="btn in buttons" :key="btn.id" 
-                                   class="w-full flex items-center justify-center font-bold px-4 py-[14px] transition cursor-default relative overflow-hidden group shadow-sm" 
+                                <a v-for="btn in buttons" :key="btn.id" 
+                                   :href="buildFinalLink(btn.type, btn.linkValue)" target="_blank"
+                                   class="w-full flex items-center justify-center font-bold px-4 py-[14px] transition cursor-pointer relative overflow-hidden group shadow-sm" 
                                    :style="{ backgroundColor: btn.color || '#d4af37', color: btn.textColor || '#000000' }">
                                     <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                     <span class="tracking-widest text-[13px]">{{ btn.title || '按鈕文字' }}</span>
-                                </div>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -191,22 +204,22 @@
                         <h3 class="font-black text-base mb-4 text-gray-800 border-b pb-2 flex items-center gap-2"><i class="ph-fill ph-palette text-pink-500"></i> 視覺與顏色設定</h3>
                         
                         <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div class="flex flex-col gap-1">
+                            <div class="flex flex-col gap-1 relative">
                                 <label class="text-[11px] font-bold text-gray-500">背景底色</label>
-                                <button @click="togglePalette('profileBg')" class="h-10 px-3 rounded-lg border bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition">
+                                <button @click.stop="togglePalette('profileBg')" class="h-10 px-3 rounded-lg border bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition">
                                     <span class="w-5 h-5 rounded-full border border-gray-300 shadow-sm" :style="{backgroundColor: profile.bgColor}"></span>
                                     <i class="ph-bold ph-caret-down text-gray-400 text-xs"></i>
                                 </button>
                                 <transition name="slide-down">
-                                    <div v-if="activePaletteId === 'profileBg'" class="absolute mt-12 bg-white p-3 rounded-xl border border-gray-200 shadow-lg z-20">
+                                    <div v-if="activePaletteId === 'profileBg'" @click.stop class="absolute mt-16 bg-white p-3 rounded-xl border border-gray-200 shadow-lg z-50">
                                         <div class="flex justify-between items-center mb-2"><span class="text-[10px] font-bold text-gray-400">滴管</span><div class="relative w-5 h-5 rounded-full cursor-pointer icolor-wheel border"><input type="color" v-model="profile.bgColor" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"></div></div>
                                         <div class="color-grid-matrix"><div v-for="(row, rIdx) in colorMatrix" :key="rIdx" class="color-row"><button v-for="c in row" :key="c" @click="profile.bgColor = c" class="color-swatch w-5 h-5" :style="{ backgroundColor: c }"></button></div></div>
                                     </div>
                                 </transition>
                             </div>
                             <div class="flex flex-col gap-1">
-                                <label class="text-[11px] font-bold text-gray-500">背景圖片</label>
-                                <button @click="openMediaLibrary('bgImage')" class="h-10 px-3 rounded-lg border bg-gray-50 flex items-center justify-center gap-2 hover:bg-gray-100 transition text-xs font-bold text-gray-600 truncate">
+                                <label class="text-[11px] font-bold text-gray-500">背景圖片 (4:5 裁切)</label>
+                                <button @click.stop="openMediaLibrary('bgImage')" class="h-10 px-3 rounded-lg border bg-gray-50 flex items-center justify-center gap-2 hover:bg-gray-100 transition text-xs font-bold text-gray-600 truncate">
                                     <i v-if="profile.bgImageUrl" class="ph-fill ph-image text-green-500"></i><i v-else class="ph-bold ph-upload-simple"></i> {{ profile.bgImageUrl ? '已設定圖片' : '上傳背景圖' }}
                                 </button>
                                 <button v-if="profile.bgImageUrl" @click="profile.bgImageUrl = ''" class="text-[10px] text-red-400 hover:text-red-600 text-right mt-1">移除背景圖</button>
@@ -214,25 +227,25 @@
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
-                            <div class="flex flex-col gap-1">
+                            <div class="flex flex-col gap-1 relative">
                                 <label class="text-[11px] font-bold text-gray-500">全域文字顏色 (名/自介)</label>
-                                <button @click="togglePalette('textColor')" class="h-10 px-3 rounded-lg border bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition">
+                                <button @click.stop="togglePalette('textColor')" class="h-10 px-3 rounded-lg border bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition">
                                     <span class="w-5 h-5 rounded-full border border-gray-300 shadow-sm" :style="{backgroundColor: profile.textColor}"></span><i class="ph-bold ph-caret-down text-gray-400 text-xs"></i>
                                 </button>
                                 <transition name="slide-down">
-                                    <div v-if="activePaletteId === 'textColor'" class="absolute mt-12 bg-white p-3 rounded-xl border border-gray-200 shadow-lg z-20">
+                                    <div v-if="activePaletteId === 'textColor'" @click.stop class="absolute mt-16 bg-white p-3 rounded-xl border border-gray-200 shadow-lg z-50">
                                         <div class="flex justify-between items-center mb-2"><span class="text-[10px] font-bold text-gray-400">滴管</span><div class="relative w-5 h-5 rounded-full cursor-pointer icolor-wheel border"><input type="color" v-model="profile.textColor" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"></div></div>
                                         <div class="color-grid-matrix"><div v-for="(row, rIdx) in colorMatrix" :key="rIdx" class="color-row"><button v-for="c in row" :key="c" @click="profile.textColor = c" class="color-swatch w-5 h-5" :style="{ backgroundColor: c }"></button></div></div>
                                     </div>
                                 </transition>
                             </div>
-                            <div class="flex flex-col gap-1">
+                            <div class="flex flex-col gap-1 relative">
                                 <label class="text-[11px] font-bold text-gray-500">社群 Icon 顏色</label>
-                                <button @click="togglePalette('socialIconColor')" class="h-10 px-3 rounded-lg border bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition">
+                                <button @click.stop="togglePalette('socialIconColor')" class="h-10 px-3 rounded-lg border bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition">
                                     <span class="w-5 h-5 rounded-full border border-gray-300 shadow-sm" :style="{backgroundColor: profile.socialIconColor}"></span><i class="ph-bold ph-caret-down text-gray-400 text-xs"></i>
                                 </button>
                                 <transition name="slide-down">
-                                    <div v-if="activePaletteId === 'socialIconColor'" class="absolute mt-12 bg-white p-3 rounded-xl border border-gray-200 shadow-lg z-20">
+                                    <div v-if="activePaletteId === 'socialIconColor'" @click.stop class="absolute mt-16 bg-white p-3 rounded-xl border border-gray-200 shadow-lg z-50">
                                         <div class="flex justify-between items-center mb-2"><span class="text-[10px] font-bold text-gray-400">滴管</span><div class="relative w-5 h-5 rounded-full cursor-pointer icolor-wheel border"><input type="color" v-model="profile.socialIconColor" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"></div></div>
                                         <div class="color-grid-matrix"><div v-for="(row, rIdx) in colorMatrix" :key="rIdx" class="color-row"><button v-for="c in row" :key="c" @click="profile.socialIconColor = c" class="color-swatch w-5 h-5" :style="{ backgroundColor: c }"></button></div></div>
                                     </div>
@@ -244,7 +257,7 @@
                     <div class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 mb-5 w-full min-w-0">
                         <h3 class="font-black text-base mb-4 text-gray-800 border-b pb-2 flex items-center gap-2"><i class="ph-fill ph-user text-blue-500"></i> 基本資料設定</h3>
                         <div class="flex gap-4 mb-4 min-w-0">
-                            <div @click="openMediaLibrary('avatar')" class="w-20 h-20 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer relative overflow-hidden group shrink-0">
+                            <div @click.stop="openMediaLibrary('avatar')" class="w-20 h-20 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer relative overflow-hidden group shrink-0">
                                 <img v-if="profile.avatarUrl" :src="profile.avatarUrl" class="w-full h-full object-cover">
                                 <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition"><i class="ph ph-camera text-xl"></i></div>
                             </div>
@@ -290,7 +303,7 @@
                         </div>
                         
                         <div class="space-y-4">
-                            <div v-for="(btn, index) in buttons" :key="btn.id" class="p-4 bg-gray-50 border border-gray-200 rounded-2xl flex flex-col gap-3 shadow-sm min-w-0">
+                            <div v-for="(btn, index) in buttons" :key="btn.id" class="p-4 bg-gray-50 border border-gray-200 rounded-2xl flex flex-col gap-3 shadow-sm min-w-0 relative">
                                 <div class="flex justify-between items-center border-b border-gray-200 pb-2">
                                     <div class="text-xs font-bold text-gray-500 truncate mr-2">按鈕項目 {{ index + 1 }}</div>
                                     <div class="flex gap-1.5 shrink-0">
@@ -315,22 +328,22 @@
                                     <span class="text-[10px] font-bold text-gray-500 flex items-center gap-1 shrink-0"><i class="ph-fill ph-cursor-click"></i> {{ btn.clicks || 0 }} 點擊</span>
                                     <div class="flex gap-2 shrink-0">
                                         <div class="relative">
-                                            <button @click="togglePalette('btnText_' + btn.id)" class="text-[10px] font-bold bg-white border px-2 py-1.5 rounded-lg flex items-center gap-1 hover:bg-gray-100 transition" title="按鈕文字色">
+                                            <button @click.stop="togglePalette('btnText_' + btn.id)" class="text-[10px] font-bold bg-white border px-2 py-1.5 rounded-lg flex items-center gap-1 hover:bg-gray-100 transition" title="按鈕文字色">
                                                 <span class="w-3 h-3 border border-gray-300 rounded-sm" :style="{backgroundColor: btn.textColor || '#000000'}"></span> 字色
                                             </button>
                                             <transition name="slide-down">
-                                                <div v-if="activePaletteId === 'btnText_' + btn.id" class="absolute right-0 bottom-8 bg-white p-2 rounded-xl border shadow-lg z-20">
+                                                <div v-if="activePaletteId === 'btnText_' + btn.id" @click.stop class="absolute right-0 bottom-8 bg-white p-2 rounded-xl border shadow-lg z-50">
                                                     <div class="relative w-5 h-5 rounded-full cursor-pointer icolor-wheel border mb-2"><input type="color" v-model="btn.textColor" class="absolute inset-0 w-full h-full opacity-0"></div>
                                                     <div class="color-grid-matrix gap-1"><div v-for="(row, rIdx) in colorMatrix" :key="rIdx" class="flex gap-1"><button v-for="c in row" :key="c" @click="btn.textColor = c" class="w-4 h-4 rounded border" :style="{ backgroundColor: c }"></button></div></div>
                                                 </div>
                                             </transition>
                                         </div>
                                         <div class="relative">
-                                            <button @click="togglePalette('btnBg_' + btn.id)" class="text-[10px] font-bold bg-white border px-2 py-1.5 rounded-lg flex items-center gap-1 hover:bg-gray-100 transition" title="按鈕背景色">
+                                            <button @click.stop="togglePalette('btnBg_' + btn.id)" class="text-[10px] font-bold bg-white border px-2 py-1.5 rounded-lg flex items-center gap-1 hover:bg-gray-100 transition" title="按鈕背景色">
                                                 <span class="w-3 h-3 border border-gray-300 rounded-sm" :style="{backgroundColor: btn.color || '#d4af37'}"></span> 底色
                                             </button>
                                             <transition name="slide-down">
-                                                <div v-if="activePaletteId === 'btnBg_' + btn.id" class="absolute right-0 bottom-8 bg-white p-2 rounded-xl border shadow-lg z-20">
+                                                <div v-if="activePaletteId === 'btnBg_' + btn.id" @click.stop class="absolute right-0 bottom-8 bg-white p-2 rounded-xl border shadow-lg z-50">
                                                     <div class="relative w-5 h-5 rounded-full cursor-pointer icolor-wheel border mb-2"><input type="color" v-model="btn.color" class="absolute inset-0 w-full h-full opacity-0"></div>
                                                     <div class="color-grid-matrix gap-1"><div v-for="(row, rIdx) in colorMatrix" :key="rIdx" class="flex gap-1"><button v-for="c in row" :key="c" @click="btn.color = c" class="w-4 h-4 rounded border" :style="{ backgroundColor: c }"></button></div></div>
                                                 </div>
@@ -403,7 +416,7 @@
                                 </div>
 
                                 <div class="flex flex-col sm:flex-row gap-4 mb-1 min-w-0">
-                                    <div @click="openMediaLibrary('slide', index)" class="w-full sm:w-28 h-28 bg-white border border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-pink-50 overflow-hidden shrink-0">
+                                    <div @click.stop="openMediaLibrary('slide', index)" class="w-full sm:w-28 h-28 bg-white border border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-pink-50 overflow-hidden shrink-0">
                                         <img v-if="slide.imageUrl" :src="slide.imageUrl" class="w-full h-full object-cover"><div v-else class="text-center text-gray-400"><i class="ph ph-upload-simple text-xl"></i><p class="text-[10px] font-bold mt-1">原圖上傳</p></div>
                                     </div>
                                     
@@ -417,12 +430,12 @@
                                         <div class="w-full mt-1 min-w-0">
                                             <div class="flex items-center gap-2 min-w-0">
                                                 <label class="text-xs font-bold text-gray-500 w-16 shrink-0">按鈕字色</label>
-                                                <button @click="togglePalette('slideTextColor_' + slide.id)" class="flex-1 min-w-0 text-sm font-bold p-2 rounded-xl border bg-white shadow-inner flex items-center justify-between text-gray-600 hover:bg-gray-50 transition">
+                                                <button @click.stop="togglePalette('slideTextColor_' + slide.id)" class="flex-1 min-w-0 text-sm font-bold p-2 rounded-xl border bg-white shadow-inner flex items-center justify-between text-gray-600 hover:bg-gray-50 transition">
                                                     <div class="flex items-center gap-2 min-w-0"><span class="w-5 h-5 rounded-full border border-gray-200 shadow-sm shrink-0" :style="{backgroundColor: slide.buttonTextColor || '#ffffff'}"></span><span class="uppercase text-[13px] truncate">{{ slide.buttonTextColor || '#FFFFFF' }}</span></div><i class="ph-bold ph-palette text-gray-400 mr-1 shrink-0"></i>
                                                 </button>
                                             </div>
                                             <transition name="slide-down">
-                                                <div v-if="activePaletteId === 'slideTextColor_' + slide.id" class="mt-2 ml-16 bg-white p-3 rounded-xl border border-gray-200 shadow-sm relative z-10">
+                                                <div v-if="activePaletteId === 'slideTextColor_' + slide.id" @click.stop class="mt-2 ml-16 bg-white p-3 rounded-xl border border-gray-200 shadow-sm relative z-50">
                                                     <div class="flex justify-between items-center mb-2"><span class="text-[10px] font-bold text-gray-400">漸層色系與滴管</span><div class="relative w-5 h-5 rounded-full cursor-pointer icolor-wheel border border-gray-200"><input type="color" v-model="slide.buttonTextColor" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"></div></div>
                                                     <div class="color-grid-matrix"><div v-for="(row, rIdx) in colorMatrix" :key="rIdx" class="color-row"><button v-for="c in row" :key="c" @click="slide.buttonTextColor = c" class="color-swatch" :class="{'ring-1 ring-gray-800': slide.buttonTextColor === c}" :style="{ backgroundColor: c }"></button></div></div>
                                                 </div>
@@ -435,13 +448,13 @@
                                     <div class="flex justify-between items-center mb-3">
                                         <span class="text-xs font-bold text-gray-500 truncate mr-2">卡片設定與按鈕 ({{ slide.buttons.length }}/5)</span>
                                         <div class="flex gap-2 shrink-0">
-                                            <button @click="togglePalette('slideBg_' + slide.id)" class="text-[10px] bg-white border px-2 py-1.5 rounded-lg font-bold text-gray-600 flex items-center gap-1 shadow-sm"><span class="w-2 h-2 rounded-full border shrink-0" :style="{backgroundColor: slide.bgColor || '#ffffff'}"></span> 卡片底色</button>
+                                            <button @click.stop="togglePalette('slideBg_' + slide.id)" class="text-[10px] bg-white border px-2 py-1.5 rounded-lg font-bold text-gray-600 flex items-center gap-1 shadow-sm"><span class="w-2 h-2 rounded-full border shrink-0" :style="{backgroundColor: slide.bgColor || '#ffffff'}"></span> 卡片底色</button>
                                             <button v-if="slide.buttons.length < 5" @click="slide.buttons.push({type: 'url', title:'', linkValue:'', color: '#6C0B22'})" class="text-[10px] bg-gray-900 text-white px-3 py-1.5 rounded-lg font-bold shadow-sm">新增按鈕</button>
                                         </div>
                                     </div>
 
                                     <transition name="slide-down">
-                                        <div v-if="activePaletteId === 'slideBg_' + slide.id" class="mb-3 bg-white p-3 rounded-xl border border-gray-200 shadow-sm relative z-10">
+                                        <div v-if="activePaletteId === 'slideBg_' + slide.id" @click.stop class="mb-3 bg-white p-3 rounded-xl border border-gray-200 shadow-sm relative z-50">
                                             <div class="flex justify-between items-center mb-2"><span class="text-[10px] font-bold text-gray-400">自訂卡片背景色</span><div class="relative w-5 h-5 rounded-full cursor-pointer icolor-wheel border border-gray-200"><input type="color" v-model="slide.bgColor" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"></div></div>
                                             <div class="color-grid-matrix"><div v-for="(row, rIdx) in colorMatrix" :key="rIdx" class="color-row"><button v-for="c in row" :key="c" @click="slide.bgColor = c" class="color-swatch" :class="{'ring-1 ring-gray-800': slide.bgColor === c}" :style="{ backgroundColor: c }"></button></div></div>
                                         </div>
@@ -468,10 +481,10 @@
                                             <div class="flex gap-2 relative mt-1 min-w-0">
                                                 <input v-model="sBtn.title" class="w-1/3 min-w-0 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="按鈕名">
                                                 <input v-model="sBtn.linkValue" class="flex-1 min-w-0 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" :placeholder="getPlaceholder(sBtn.type)">
-                                                <button @click="togglePalette('sBtn_' + slide.id + '_' + bIdx)" class="w-9 shrink-0 flex items-center justify-center bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 transition"><span class="w-4 h-4 rounded-full border border-gray-300" :style="{backgroundColor: sBtn.color || '#6C0B22'}"></span></button>
+                                                <button @click.stop="togglePalette('sBtn_' + slide.id + '_' + bIdx)" class="w-9 shrink-0 flex items-center justify-center bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 transition"><span class="w-4 h-4 rounded-full border border-gray-300" :style="{backgroundColor: sBtn.color || '#6C0B22'}"></span></button>
                                             </div>
                                             <transition name="slide-down">
-                                                <div v-if="activePaletteId === 'sBtn_' + slide.id + '_' + bIdx" class="mt-2 bg-white p-3 rounded-xl border border-gray-200 shadow-sm relative z-10">
+                                                <div v-if="activePaletteId === 'sBtn_' + slide.id + '_' + bIdx" @click.stop class="mt-2 bg-white p-3 rounded-xl border border-gray-200 shadow-sm relative z-50">
                                                     <div class="flex justify-between items-center mb-2"><span class="text-[10px] font-bold text-gray-400">按鈕底色與滴管</span><div class="relative w-5 h-5 rounded-full cursor-pointer icolor-wheel border border-gray-200"><input type="color" v-model="sBtn.color" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"></div></div>
                                                     <div class="color-grid-matrix"><div v-for="(row, rIdx) in colorMatrix" :key="rIdx" class="color-row"><button v-for="c in row" :key="c" @click="sBtn.color = c" class="color-swatch w-5 h-5" :class="{'ring-1 ring-gray-800': sBtn.color === c}" :style="{ backgroundColor: c }"></button></div></div>
                                                 </div>
@@ -584,7 +597,7 @@
             ['#eff6ff', '#7dd3fc', '#0ea5e9', '#0369a1', '#0c4a6e'], 
             ['#fdf2f8', '#f9a8d4', '#ec4899', '#be185d', '#831843'], 
             ['#f9fafb', '#d1d5db', '#6b7280', '#1f2937', '#000000'],
-            ['#d4af37', '#b6902b', '#ffffff', '#e5e7eb', '#333333'] // 加入金色與純粹系
+            ['#d4af37', '#b6902b', '#ffffff', '#e5e7eb', '#333333'] 
         ]);
 
         const buttonTypes = ref([
@@ -600,7 +613,6 @@
             return map[type] || '輸入內容';
         };
 
-        // ★ YouTube 影片 ID 萃取工具
         const getYoutubeEmbedUrl = (url) => {
             if (!url) return null;
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
@@ -647,7 +659,6 @@
             }
         };
 
-        // ★ Profile 響應變數，新增各項客製化顏色與連結
         const profile = ref({ 
             avatarUrl: '', name: '', bio: '', bgColor: '#dddddd', bgImageUrl: '', textColor: '#1a1a1a', 
             socialIconColor: '#000000', fbUrl: '', igUrl: '', lineUrl: '', tiktokUrl: '', ytUrl: '' 
@@ -902,15 +913,17 @@
         
         const closeMediaLibrary = () => { isMediaModalOpen.value = false; };
 
+        // ★ 更新檔案上傳邏輯，支援雙重裁切
         const handleFileSelect = (e) => {
             const files = e.target.files;
             if (!files || files.length === 0) return;
             
-            if (currentUploadContext.value === 'avatar') {
+            if (currentUploadContext.value === 'avatar' || currentUploadContext.value === 'bgImage') {
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     isMediaModalOpen.value = false;
-                    openCropper(event.target.result);
+                    // 大頭貼 1:1，背景圖 4:5
+                    openCropper(event.target.result, currentUploadContext.value === 'bgImage' ? 4/5 : 1);
                 };
                 reader.readAsDataURL(files[0]);
             } else {
@@ -919,14 +932,14 @@
             e.target.value = '';
         };
 
-        const openCropper = (imgData) => {
+        const openCropper = (imgData, ratio = 1) => {
             if (typeof Cropper === 'undefined') { showToast('裁切器載入異常', 'error'); return; }
             isCropModalOpen.value = true;
             nextTick(() => {
                 const imgEl = document.getElementById('cropImageTarget'); 
                 imgEl.src = imgData;
                 if (cropperInstance) cropperInstance.destroy();
-                cropperInstance = new Cropper(imgEl, { aspectRatio: 1, viewMode: 1, dragMode: 'move', autoCropArea: 1, cropBoxResizable: false, guides: false, center: false, highlight: false });
+                cropperInstance = new Cropper(imgEl, { aspectRatio: ratio, viewMode: 1, dragMode: 'move', autoCropArea: 1, cropBoxResizable: false, guides: false, center: false, highlight: false });
             });
         };
         
@@ -940,19 +953,25 @@
             if (!cropperInstance) return;
             isUploading.value = true;
             
-            const fullBase64 = cropperInstance.getCroppedCanvas({ width: 600, height: 600 }).toDataURL('image/jpeg', 0.85);
+            const isBg = currentUploadContext.value === 'bgImage';
+            const targetWidth = isBg ? 800 : 600;
+            const targetHeight = isBg ? 1000 : 600;
+
+            const fullBase64 = cropperInstance.getCroppedCanvas({ width: targetWidth, height: targetHeight }).toDataURL('image/jpeg', 0.85);
             const b64Data = fullBase64.split(',')[1];
             const tempId = 'temp_' + Date.now();
             const tempImg = { id: tempId, url: fullBase64, name: 'cropped_image.jpg' };
             
             mediaImages.value.unshift(tempImg);
-            profile.value.avatarUrl = fullBase64;
+            
+            if (isBg) profile.value.bgImageUrl = fullBase64;
+            else profile.value.avatarUrl = fullBase64;
             
             showToast('圖片已即時套用！背景上傳雲端中...');
             closeCropper();
             isUploading.value = false;
 
-            uploadToDrive(b64Data, 'image/jpeg', 'jpg', currentUser.value.profileFolderId, tempId, 'avatar', null);
+            uploadToDrive(b64Data, 'image/jpeg', 'jpg', currentUser.value.profileFolderId, tempId, currentUploadContext.value, null);
         };
 
         const directUpload = (file) => {
