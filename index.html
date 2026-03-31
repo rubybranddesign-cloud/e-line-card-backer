@@ -684,6 +684,9 @@
         const isUploading = ref(false);
         let cropperInstance = null;
 
+        // ★ 核心優化：防碰撞超高精度 ID 產生器
+        const createUniqueId = (prefix) => `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).substr(2, 8)}`;
+
         const apiCall = async (payload) => {
           try { 
               const res = await fetch(GAS_API_URL, { method: 'POST', body: JSON.stringify(payload) }); 
@@ -809,33 +812,31 @@
         const togglePalette = (id) => { activePaletteId.value = activePaletteId.value === id ? null : id; };
         
         const addNewButton = () => { 
-            buttons.value.push({ id: Date.now().toString(), type: 'url', title: '', linkValue: '', color: '#d4af37', textColor: '#000000', iconUrl: '', clicks: 0 }); 
+            buttons.value.push({ id: createUniqueId('btn'), type: 'url', title: '', linkValue: '', color: '#d4af37', textColor: '#000000', iconUrl: '', clicks: 0 }); 
             nextTick(()=>{ window.scrollTo(0, document.body.scrollHeight); }); 
         };
 
-        // ★ 加入全新的待編輯按鈕區塊
         const insertNewButton = (index) => {
             buttons.value.splice(index + 1, 0, {
-                id: Date.now().toString(), type: 'url', title: '', linkValue: '', color: '#d4af37', textColor: '#000000', iconUrl: '', clicks: 0
+                id: createUniqueId('btn'), type: 'url', title: '', linkValue: '', color: '#d4af37', textColor: '#000000', iconUrl: '', clicks: 0
             });
         };
         
         const addNewSlide = () => { 
-            slides.value.push({ id: Date.now().toString(), sort: slides.value.length + 1, imageUrl: '', buttonFont: '預設字體', buttonTextColor: '#ffffff', bgColor: '#ffffff', buttons: [] }); 
+            slides.value.push({ id: createUniqueId('sld'), sort: slides.value.length + 1, imageUrl: '', buttonFont: '預設字體', buttonTextColor: '#ffffff', bgColor: '#ffffff', buttons: [] }); 
             nextTick(() => { window.scrollTo(0, document.body.scrollHeight); }); 
         };
 
-        // ★ 加入全新的待編輯輪播卡片 (取代複製原本的)
         const insertNewSlide = (index) => {
             slides.value.splice(index + 1, 0, {
-                id: Date.now().toString(), sort: slides.value.length + 2, imageUrl: '', buttonFont: '預設字體', buttonTextColor: '#ffffff', bgColor: '#ffffff', buttons: []
+                id: createUniqueId('sld'), sort: slides.value.length + 2, imageUrl: '', buttonFont: '預設字體', buttonTextColor: '#ffffff', bgColor: '#ffffff', buttons: []
             });
         };
 
         const duplicateSlide = (index) => {
             const original = slides.value[index];
             const cloned = JSON.parse(JSON.stringify(original)); 
-            cloned.id = Date.now().toString() + Math.random().toString(36).substr(2, 5); 
+            cloned.id = createUniqueId('sld'); 
             slides.value.splice(index + 1, 0, cloned);
             showToast('已成功複製卡片');
         };
