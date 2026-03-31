@@ -175,7 +175,7 @@
                                 <a v-if="profile.fbUrl" :href="profile.fbUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-facebook-logo text-[28px]"></i></a>
                                 <a v-if="profile.igUrl" :href="profile.igUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-instagram-logo text-[28px]"></i></a>
                                 <a v-if="profile.lineUrl" :href="profile.lineUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }">
-                                    <svg viewBox="0 0 24 24" fill="currentColor" class="w-[28px] h-[28px]"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 3C5.373 3 0 7.363 0 12.76c0 4.808 4.264 8.835 10.022 9.598.391.084.922.257 1.057.59.123.303.078.777.039 1.085l-.17 1.025c-.053.303-.243 1.184 1.037.646 1.282-.54 6.91-4.061 9.426-6.958C23.15 16.837 24 14.908 24 12.76 24 7.363 18.627 3 12 3zM5.186 14.542h-1.64c-.454 0-.821-.366-.821-.82v-3.64c0-.454.367-.822.821-.822h1.64c.453 0 .821.368.821.822v3.64c0 .454-.368.82-.821.82zm3.621 0H7.167c-.453 0-.82-.366-.82-.82v-4.46c0-.454.367-.822.82-.822s.821.368.821.822v4.46c0 .454-.368.82-.821.82zm5.005-3.226l-2.278 3.007c-.029.034-.061.066-.098.093l-.004.004c-.035.023-.073.044-.112.062-.008.004-.016.006-.023.01-.044.017-.091.031-.139.04-.015.003-.031.004-.047.006-.048.006-.097.008-.146.008-.052 0-.102-.002-.153-.008-.013-.002-.025-.003-.037-.006-.051-.01-.1-.024-.148-.041-.007-.003-.014-.006-.02-.009-.041-.019-.081-.04-.118-.065l-.004-.002c-.035-.027-.068-.059-.096-.092L10.584 10.82v2.902c0 .454-.367.82-.82.82s-.821-.366-.821-.82v-4.46c0-.225.093-.43.239-.58l.004-.004c.036-.034.075-.064.116-.09.006-.004.013-.007.019-.01.045-.022.093-.04.143-.053.012-.003.025-.005.038-.007.051-.007.102-.01.154-.01.05 0 .099.003.148.009.015.002.03.003.044.006.05.013.098.031.144.053.007.003.013.006.02.01.04.025.078.055.114.089l.004.003 2.278 3.007V9.36c0-.454.368-.822.821-.822s.821.368.821.822v4.46c0 .454-.368.82-.821.82zm5.32 1.586h-3.418c-.453 0-.82-.366-.82-.82V9.36c0-.454.367-.822.82-.822h3.418c.454 0 .821.368.821.822s-.367.822-.821.822h-2.598v.994h2.598c.454 0 .821.367.821.82s-.367.821-.821.821h-2.598v.994h2.598c.454 0 .821.367.821.82s-.367.82-.821.82z" /></svg>
+                                    <svg viewBox="0 0 24 24" fill="currentColor" class="w-[28px] h-[28px]" xmlns="http://www.w3.org/2000/svg"><path d="M12 3C5.373 3 0 7.363 0 12.76c0 4.808 4.264 8.835 10.022 9.598.391.084.922.257 1.057.59.123.303.078.777.039 1.085l-.17 1.025c-.053.303-.243 1.184 1.037.646 1.282-.54 6.91-4.061 9.426-6.958C23.15 16.837 24 14.908 24 12.76 24 7.363 18.627 3 12 3z"/></svg>
                                 </a>
                                 <a v-if="profile.wechatUrl" :href="profile.wechatUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-wechat-logo text-[28px]"></i></a>
                                 <a v-if="profile.tiktokUrl" :href="profile.tiktokUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-tiktok-logo text-[28px]"></i></a>
@@ -282,7 +282,8 @@
                                 <input v-model="profile.igUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="Instagram 連結">
                             </div>
                             <div class="flex items-center gap-2">
-                                <svg viewBox="0 0 24 24" fill="currentColor" class="text-gray-400 w-6 h-6"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 3C5.373 3 0 7.363 0 12.76c0 4.808 4.264 8.835 10.022 9.598.391.084.922.257 1.057.59.123.303.078.777.039 1.085l-.17 1.025c-.053.303-.243 1.184 1.037.646 1.282-.54 6.91-4.061 9.426-6.958C23.15 16.837 24 14.908 24 12.76 24 7.363 18.627 3 12 3zM5.186 14.542h-1.64c-.454 0-.821-.366-.821-.82v-3.64c0-.454.367-.822.821-.822h1.64c.453 0 .821.368.821.822v3.64c0 .454-.368.82-.821.82zm3.621 0H7.167c-.453 0-.82-.366-.82-.82v-4.46c0-.454.367-.822.82-.822s.821.368.821.822v4.46c0 .454-.368.82-.821.82zm5.005-3.226l-2.278 3.007c-.029.034-.061.066-.098.093l-.004.004c-.035.023-.073.044-.112.062-.008.004-.016.006-.023.01-.044.017-.091.031-.139.04-.015.003-.031.004-.047.006-.048.006-.097.008-.146.008-.052 0-.102-.002-.153-.008-.013-.002-.025-.003-.037-.006-.051-.01-.1-.024-.148-.041-.007-.003-.014-.006-.02-.009-.041-.019-.081-.04-.118-.065l-.004-.002c-.035-.027-.068-.059-.096-.092L10.584 10.82v2.902c0 .454-.367.82-.82.82s-.821-.366-.821-.82v-4.46c0-.225.093-.43.239-.58l.004-.004c.036-.034.075-.064.116-.09.006-.004.013-.007.019-.01.045-.022.093-.04.143-.053.012-.003.025-.005.038-.007.051-.007.102-.01.154-.01.05 0 .099.003.148.009.015.002.03.003.044.006.05.013.098.031.144.053.007.003.013.006.02.01.04.025.078.055.114.089l.004.003 2.278 3.007V9.36c0-.454.368-.822.821-.822s.821.368.821.822v4.46c0 .454-.368.82-.821.82zm5.32 1.586h-3.418c-.453 0-.82-.366-.82-.82V9.36c0-.454.367-.822.82-.822h3.418c.454 0 .821.368.821.822s-.367.822-.821.822h-2.598v.994h2.598c.454 0 .821.367.821.82s-.367.821-.821.821h-2.598v.994h2.598c.454 0 .821.367.821.82s-.367.82-.821.82z" /></svg>
+                                <svg viewBox="0 0 24 24" fill="currentColor" class="text-gray-400 w-6 h-6 shrink-0" xmlns="http://www.w3.org/2000/svg"><path d="M12 3C5.373 3 0 7.363 0 12.76c0 4.808 4.264 8.835 10.022 9.598.391.084.922.257 1.057.59.123.303.078.777.039 1.085l-.17 1.025c-.053.303-.243 1.184 1.037.646 1.282-.54 6.91-4.061 9.426-6.958C23.15 16.837 24 14.908 24 12.76 24 7.363 18.627 3 12 3z"/></svg>
+                                <input v-model="profile.lineUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="LINE 官方帳號/好友連結">
                             </div>
                             <div class="flex items-center gap-2">
                                 <i class="ph-fill ph-wechat-logo text-gray-400 text-xl w-6"></i>
@@ -638,7 +639,6 @@
             return { type: 'url', value: url };
         };
 
-        // ★ 更新的跨平台分享引擎，全面支援 PC 瀏覽器與手機雙系統
         const buildFinalLink = (type, value) => {
             if (!value) return '#';
             if (type === 'tel') return value.startsWith('tel:') ? value : 'tel:' + value;
@@ -660,7 +660,6 @@
             return map[fontName] || 'sans-serif';
         };
 
-        // ★ 動態抓取名稱並生成分享文案
         const handleTypeChange = (item) => {
             if (item.type === 'share') {
                 const liffId = "2009561347-VUhbtrEC"; 
@@ -1046,7 +1045,6 @@
             isMediaModalOpen.value = false; 
         };
 
-        // ★ 同步更新複製按鈕的分享文案
         const shareProfilePage = async () => {
             if (!currentUser.value) return;
             const liffId = "2009561347-VUhbtrEC"; 
