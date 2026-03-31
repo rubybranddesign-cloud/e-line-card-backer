@@ -55,7 +55,6 @@
     input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
     input[type="color"]::-webkit-color-swatch { border: none; border-radius: 100%; }
 
-    /* ★ 客製化名片區塊隱藏捲軸但允許捲動 */
     .preview-body-container::-webkit-scrollbar { display: none; }
     .preview-body-container { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
@@ -157,7 +156,6 @@
                         
                         <div v-if="profile.bgImageUrl" class="relative w-full aspect-[4/5] shrink-0 bg-cover bg-center flex flex-col justify-end items-center pb-[2px]" :style="{ backgroundImage: `url(${profile.bgImageUrl})` }">
                             <div class="absolute bottom-0 left-0 w-full h-1/2" :style="{ background: `linear-gradient(to top, ${profile.bgColor} 0%, transparent 100%)` }"></div>
-                            
                             <div class="relative z-10 mb-3">
                                 <img :src="profile.avatarUrl || 'https://via.placeholder.com/150'" class="w-[110px] h-[110px] rounded-full object-cover border-2 border-white/50 shadow-md bg-gray-100">
                             </div>
@@ -170,14 +168,14 @@
                         </div>
 
                         <div class="relative z-10 w-full flex flex-col items-center px-6 pb-10">
-                            
                             <div class="text-2xl font-black text-center mb-1 tracking-wider" :style="{ color: profile.textColor }">{{ profile.name || '顯示名稱' }}</div>
                             <div class="text-[13px] text-center whitespace-pre-wrap leading-relaxed w-full break-words opacity-90" :style="{ color: profile.textColor }">{{ profile.bio || '尚未填寫自介' }}</div>
 
-                            <div v-if="profile.fbUrl || profile.igUrl || profile.lineUrl || profile.tiktokUrl" class="flex gap-4 mt-5 mb-2 justify-center items-center">
+                            <div v-if="profile.fbUrl || profile.igUrl || profile.lineUrl || profile.tiktokUrl || profile.wechatUrl" class="flex gap-4 mt-5 mb-2 justify-center items-center">
                                 <a v-if="profile.fbUrl" :href="profile.fbUrl" target="_blank" class="hover:opacity-80 transition" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-facebook-logo text-[28px]"></i></a>
                                 <a v-if="profile.igUrl" :href="profile.igUrl" target="_blank" class="hover:opacity-80 transition" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-instagram-logo text-[28px]"></i></a>
                                 <a v-if="profile.lineUrl" :href="profile.lineUrl" target="_blank" class="hover:opacity-80 transition" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-chat-circle text-[28px]"></i></a>
+                                <a v-if="profile.wechatUrl" :href="profile.wechatUrl" target="_blank" class="hover:opacity-80 transition" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-wechat-logo text-[28px]"></i></a>
                                 <a v-if="profile.tiktokUrl" :href="profile.tiktokUrl" target="_blank" class="hover:opacity-80 transition" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-tiktok-logo text-[28px]"></i></a>
                             </div>
 
@@ -188,7 +186,7 @@
                             <div class="w-full mt-5 space-y-3 pb-6">
                                 <a v-for="btn in buttons" :key="btn.id" 
                                    :href="buildFinalLink(btn.type, btn.linkValue)" target="_blank"
-                                   class="w-full flex items-center justify-center font-bold px-4 py-[14px] transition cursor-pointer relative overflow-hidden group shadow-sm" 
+                                   class="w-full flex items-center justify-center font-bold px-4 py-[14px] transition cursor-pointer relative overflow-hidden group shadow-sm rounded-[2px]" 
                                    :style="{ backgroundColor: btn.color || '#d4af37', color: btn.textColor || '#000000' }">
                                     <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                     <span class="tracking-widest text-[13px]">{{ btn.title || '按鈕文字' }}</span>
@@ -286,6 +284,10 @@
                                 <input v-model="profile.lineUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="LINE 官方帳號/好友連結">
                             </div>
                             <div class="flex items-center gap-2">
+                                <i class="ph-fill ph-wechat-logo text-gray-400 text-xl w-6"></i>
+                                <input v-model="profile.wechatUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="WeChat 連結">
+                            </div>
+                            <div class="flex items-center gap-2">
                                 <i class="ph-fill ph-tiktok-logo text-gray-400 text-xl w-6"></i>
                                 <input v-model="profile.tiktokUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="TikTok 連結">
                             </div>
@@ -299,7 +301,7 @@
                     <div class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 mb-6 w-full min-w-0">
                         <div class="flex justify-between items-center border-b pb-2 mb-4">
                             <h3 class="font-black text-base text-gray-800 flex items-center gap-2"><i class="ph-fill ph-link-simple text-orange-500"></i> 主頁按鈕管理</h3>
-                            <button @click="addNewButton" class="text-pink-600 font-bold text-xs bg-pink-50 px-3 py-1.5 rounded-lg hover:bg-pink-100 shrink-0"><i class="ph ph-plus"></i> 新增</button>
+                            <button @click="insertNewButton(buttons.length - 1)" class="text-pink-600 font-bold text-xs bg-pink-50 px-3 py-1.5 rounded-lg hover:bg-pink-100 shrink-0"><i class="ph ph-plus"></i> 新增</button>
                         </div>
                         
                         <div class="space-y-4">
@@ -309,6 +311,7 @@
                                     <div class="flex gap-1.5 shrink-0">
                                         <button @click="moveItem(buttons, index, -1)" :disabled="index === 0" class="p-1 bg-white border rounded text-gray-500 disabled:opacity-30 hover:bg-gray-100 transition"><i class="ph ph-arrow-up"></i></button>
                                         <button @click="moveItem(buttons, index, 1)" :disabled="index === buttons.length - 1" class="p-1 bg-white border rounded text-gray-500 disabled:opacity-30 hover:bg-gray-100 transition"><i class="ph ph-arrow-down"></i></button>
+                                        <button @click="insertNewButton(index)" title="在下方新增空白按鈕" class="p-1 bg-blue-50 border border-blue-100 text-blue-500 rounded hover:bg-blue-100 transition"><i class="ph-bold ph-plus"></i></button>
                                         <button @click="requestDelete('button', btn.id, index, btn.title)" class="p-1 bg-red-50 border border-red-100 text-red-500 rounded hover:bg-red-100 transition"><i class="ph ph-trash"></i></button>
                                     </div>
                                 </div>
@@ -400,7 +403,7 @@
                     <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 w-full min-w-0">
                         <div class="flex justify-between items-center border-b pb-4 mb-4">
                             <h3 class="font-black text-lg text-gray-800">輪播卡片編輯</h3>
-                            <button @click="addNewSlide" class="text-pink-600 font-bold text-xs bg-pink-50 px-3 py-1.5 rounded-lg shrink-0"><i class="ph ph-plus"></i> 新增卡片</button>
+                            <button @click="insertNewSlide(slides.length - 1)" class="text-pink-600 font-bold text-xs bg-pink-50 px-3 py-1.5 rounded-lg shrink-0"><i class="ph ph-plus"></i> 新增卡片</button>
                         </div>
                         
                         <div class="space-y-6">
@@ -410,7 +413,7 @@
                                     <div class="flex gap-1.5 shrink-0">
                                         <button @click="moveItem(slides, index, -1)" :disabled="index === 0" class="p-1 bg-white border border-gray-200 rounded text-gray-500 disabled:opacity-30 hover:bg-gray-100"><i class="ph ph-arrow-up"></i></button>
                                         <button @click="moveItem(slides, index, 1)" :disabled="index === slides.length - 1" class="p-1 bg-white border border-gray-200 rounded text-gray-500 disabled:opacity-30 hover:bg-gray-100"><i class="ph ph-arrow-down"></i></button>
-                                        <button @click="duplicateSlide(index)" title="複製此卡片" class="p-1 bg-blue-50 border border-blue-100 text-blue-500 rounded hover:bg-blue-100 transition"><i class="ph-bold ph-plus"></i></button>
+                                        <button @click="insertNewSlide(index)" title="在下方新增空白卡片" class="p-1 bg-blue-50 border border-blue-100 text-blue-500 rounded hover:bg-blue-100 transition"><i class="ph-bold ph-plus"></i></button>
                                         <button @click="requestDelete('slide', slide.id, index, '第 ' + (index + 1) + ' 張輪播圖')" class="p-1 bg-red-50 border border-red-100 text-red-500 rounded hover:bg-red-100"><i class="ph ph-trash"></i></button>
                                     </div>
                                 </div>
@@ -661,7 +664,7 @@
 
         const profile = ref({ 
             avatarUrl: '', name: '', bio: '', bgColor: '#dddddd', bgImageUrl: '', textColor: '#1a1a1a', 
-            socialIconColor: '#000000', fbUrl: '', igUrl: '', lineUrl: '', tiktokUrl: '', ytUrl: '' 
+            socialIconColor: '#000000', fbUrl: '', igUrl: '', lineUrl: '', tiktokUrl: '', ytUrl: '', wechatUrl: ''
         });
         const buttons = ref([]);
         const slides = ref([]); 
@@ -806,13 +809,27 @@
         const togglePalette = (id) => { activePaletteId.value = activePaletteId.value === id ? null : id; };
         
         const addNewButton = () => { 
-            buttons.value.push({ id: Date.now().toString(), type: 'url', title: '', linkValue: '', color: '#d4af37', textColor: '#000000', iconUrl: '' }); 
+            buttons.value.push({ id: Date.now().toString(), type: 'url', title: '', linkValue: '', color: '#d4af37', textColor: '#000000', iconUrl: '', clicks: 0 }); 
             nextTick(()=>{ window.scrollTo(0, document.body.scrollHeight); }); 
+        };
+
+        // ★ 加入全新的待編輯按鈕區塊
+        const insertNewButton = (index) => {
+            buttons.value.splice(index + 1, 0, {
+                id: Date.now().toString(), type: 'url', title: '', linkValue: '', color: '#d4af37', textColor: '#000000', iconUrl: '', clicks: 0
+            });
         };
         
         const addNewSlide = () => { 
-            slides.value.push({ id: Date.now().toString(), sort: slides.value.length + 1, imageUrl: '', buttonFont: '預設字體', buttonTextColor: '#ffffff', buttons: [] }); 
+            slides.value.push({ id: Date.now().toString(), sort: slides.value.length + 1, imageUrl: '', buttonFont: '預設字體', buttonTextColor: '#ffffff', bgColor: '#ffffff', buttons: [] }); 
             nextTick(() => { window.scrollTo(0, document.body.scrollHeight); }); 
+        };
+
+        // ★ 加入全新的待編輯輪播卡片 (取代複製原本的)
+        const insertNewSlide = (index) => {
+            slides.value.splice(index + 1, 0, {
+                id: Date.now().toString(), sort: slides.value.length + 2, imageUrl: '', buttonFont: '預設字體', buttonTextColor: '#ffffff', bgColor: '#ffffff', buttons: []
+            });
         };
 
         const duplicateSlide = (index) => {
@@ -913,7 +930,6 @@
         
         const closeMediaLibrary = () => { isMediaModalOpen.value = false; };
 
-        // ★ 更新檔案上傳邏輯，支援雙重裁切
         const handleFileSelect = (e) => {
             const files = e.target.files;
             if (!files || files.length === 0) return;
@@ -922,7 +938,6 @@
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     isMediaModalOpen.value = false;
-                    // 大頭貼 1:1，背景圖 4:5
                     openCropper(event.target.result, currentUploadContext.value === 'bgImage' ? 4/5 : 1);
                 };
                 reader.readAsDataURL(files[0]);
@@ -1055,7 +1070,7 @@
           mobileViewModeProfile, mobileViewModeSlide, activePaletteId, togglePalette,
           isLoading, isFetchingData, isSaving, toast, confirmModal, requestDelete, executeConfirm,
           handleLogin, handleRegister, handleForgotPassword, logout, saveAllData, saveSlidesData, autoResize,
-          profile, buttons, slides, addNewButton, addNewSlide, duplicateSlide, moveItem, 
+          profile, buttons, slides, addNewButton, addNewSlide, duplicateSlide, moveItem, insertNewButton, insertNewSlide,
           isMediaModalOpen, mediaImages, isLoadingImages, openMediaLibrary, closeMediaLibrary, selectImage,
           handleFileSelect, deleteGalleryImage, isCropModalOpen, isUploading, closeCropper, confirmCropAndUpload,
           isProfileLinkCopied, shareProfilePage
