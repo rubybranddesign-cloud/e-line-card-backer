@@ -154,8 +154,8 @@
                     <div class="preview-body-container flex flex-col flex-1 transition-all duration-500 relative overflow-y-auto w-full no-scrollbar"
                          :style="{ backgroundColor: profile.bgColor }">
                         
-                        <div v-if="profile.bgImageUrl" class="relative w-full aspect-[4/5] shrink-0 bg-cover bg-center flex flex-col justify-end items-center pb-[2px]" :style="{ backgroundImage: `url(${profile.bgImageUrl})` }">
-                            <div class="absolute bottom-0 left-0 w-full h-1/2" :style="{ background: `linear-gradient(to top, ${profile.bgColor} 0%, transparent 100%)` }"></div>
+                        <div v-if="profile.bgImageUrl" class="relative w-full aspect-[4/5] shrink-0 bg-cover bg-center flex flex-col justify-end items-center pb-[2px]" :style="{ backgroundImage: 'url(' + profile.bgImageUrl + ')' }">
+                            <div class="absolute bottom-0 left-0 w-full h-1/2" :style="{ background: 'linear-gradient(to top, ' + profile.bgColor + ' 0%, transparent 100%)' }"></div>
                             <div class="relative z-10 mb-3">
                                 <img :src="profile.avatarUrl || 'https://via.placeholder.com/150'" class="w-[110px] h-[110px] rounded-full object-cover border-2 border-white/50 shadow-md bg-gray-100">
                             </div>
@@ -175,14 +175,14 @@
                                 <a v-if="profile.fbUrl" :href="profile.fbUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-facebook-logo text-[28px]"></i></a>
                                 <a v-if="profile.igUrl" :href="profile.igUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-instagram-logo text-[28px]"></i></a>
                                 <a v-if="profile.lineUrl" :href="profile.lineUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }">
-    <svg viewBox="0 0 24 24" fill="currentColor" class="w-[28px] h-[28px]" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M24 12c0 6.627-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0s12 5.373 12 12zm-12-7.5c-4.606 0-8.25 3.03-8.25 6.75 0 3.35 2.5 6.17 6.13 6.68.25.05.58.15.65.37.06.2.04.5.02.7l-.1.65c-.03.2-.15.75.65.4 1-.45 5.5-2.3 7.4-4.25 1.25-1.25 1.75-2.7 1.75-4.3C20.25 7.53 16.606 4.5 12 4.5z" /></svg>
-</a>
+                                    <svg viewBox="0 0 24 24" fill="currentColor" class="w-[28px] h-[28px]" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M24 12c0 6.627-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0s12 5.373 12 12zm-12-7.5c-4.606 0-8.25 3.03-8.25 6.75 0 3.35 2.5 6.17 6.13 6.68.25.05.58.15.65.37.06.2.04.5.02.7l-.1.65c-.03.2-.15.75.65.4 1-.45 5.5-2.3 7.4-4.25 1.25-1.25 1.75-2.7 1.75-4.3C20.25 7.53 16.606 4.5 12 4.5z" /></svg>
+                                </a>
                                 <a v-if="profile.wechatUrl" :href="profile.wechatUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-wechat-logo text-[28px]"></i></a>
                                 <a v-if="profile.tiktokUrl" :href="profile.tiktokUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-tiktok-logo text-[28px]"></i></a>
                             </div>
 
                             <div v-if="profile.ytUrl && getYoutubeEmbedUrl(profile.ytUrl)" class="w-full mt-4 mb-2 rounded-xl overflow-hidden shadow-lg aspect-video bg-black shrink-0 border border-white/20">
-                                <iframe :src="`https://www.youtube.com/embed/${getYoutubeEmbedUrl(profile.ytUrl)}`" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                <iframe :src="'https://www.youtube.com/embed/' + getYoutubeEmbedUrl(profile.ytUrl)" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                             </div>
 
                             <div class="w-full mt-5 space-y-3 pb-6">
@@ -190,8 +190,8 @@
                                    :href="buildFinalLink(btn.type, btn.linkValue)" target="_blank"
                                    class="w-full flex items-center justify-center font-bold px-4 py-[14px] transition cursor-pointer relative overflow-hidden group shadow-sm rounded-[2px]" 
                                    :style="{ backgroundColor: btn.color || '#d4af37', color: btn.textColor || '#000000' }">
-                                    <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                    <span class="tracking-widest text-[13px]">{{ btn.title || '按鈕文字' }}</span>
+                                   <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                   <span class="tracking-widest text-[13px]">{{ btn.title || '按鈕文字' }}</span>
                                 </a>
                             </div>
                         </div>
@@ -282,9 +282,9 @@
                                 <input v-model="profile.igUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="Instagram 連結">
                             </div>
                             <div class="flex items-center gap-2">
-    <svg viewBox="0 0 24 24" fill="currentColor" class="text-gray-400 w-6 h-6 shrink-0" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M24 12c0 6.627-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0s12 5.373 12 12zm-12-7.5c-4.606 0-8.25 3.03-8.25 6.75 0 3.35 2.5 6.17 6.13 6.68.25.05.58.15.65.37.06.2.04.5.02.7l-.1.65c-.03.2-.15.75.65.4 1-.45 5.5-2.3 7.4-4.25 1.25-1.25 1.75-2.7 1.75-4.3C20.25 7.53 16.606 4.5 12 4.5z" /></svg>
-    <input v-model="profile.lineUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="LINE 官方帳號/好友連結">
-</div>
+                                <svg viewBox="0 0 24 24" fill="currentColor" class="text-gray-400 w-6 h-6 shrink-0" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M24 12c0 6.627-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0s12 5.373 12 12zm-12-7.5c-4.606 0-8.25 3.03-8.25 6.75 0 3.35 2.5 6.17 6.13 6.68.25.05.58.15.65.37.06.2.04.5.02.7l-.1.65c-.03.2-.15.75.65.4 1-.45 5.5-2.3 7.4-4.25 1.25-1.25 1.75-2.7 1.75-4.3C20.25 7.53 16.606 4.5 12 4.5z" /></svg>
+                                <input v-model="profile.lineUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="LINE 官方帳號/好友連結">
+                            </div>
                             <div class="flex items-center gap-2">
                                 <i class="ph-fill ph-wechat-logo text-gray-400 text-xl w-6"></i>
                                 <input v-model="profile.wechatUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="WeChat 連結">
@@ -360,9 +360,16 @@
                         </div>
                     </div>
 
-                    <button @click="saveAllData" class="w-full bg-gray-900 text-white font-bold py-4 rounded-xl hover:bg-black transition flex justify-center items-center gap-2 shadow-xl hover:shadow-2xl mb-10">
-                        <i v-if="isSaving" class="ph ph-spinner animate-spin"></i> {{ isSaving ? '同步中...' : '儲存變更至前台' }}
-                    </button>
+                    <div class="flex flex-col gap-3 mb-10 w-full">
+                        <button @click="saveAllData" class="w-full bg-gray-900 text-white font-bold py-4 rounded-xl hover:bg-black transition flex justify-center items-center gap-2 shadow-sm">
+                            <i v-if="isSaving" class="ph ph-spinner animate-spin"></i> {{ isSaving ? '同步中...' : '先儲存變更' }}
+                        </button>
+                        <button @click="publishToWeb" :disabled="isPublishingWeb" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-4 rounded-xl hover:opacity-90 transition flex justify-center items-center gap-2 shadow-xl hover:shadow-2xl disabled:opacity-50">
+                            <i v-if="isPublishingWeb" class="ph ph-spinner animate-spin"></i>
+                            <i v-else class="ph-fill ph-rocket"></i> 
+                            {{ isPublishingWeb ? '🚀 正在產生靜態網頁與推送至 GitHub...' : '一鍵發佈公開專屬網頁' }}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -554,6 +561,9 @@
   <script>
     const { createApp, ref, onMounted, nextTick } = Vue;
 
+    // 👇👇👇 系統前後端分離：請在此貼上您剛剛部署獲得的 Google Apps Script (GAS) WebApp URL 👇👇👇
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzv1iBsoI7jo4rMH3dxoxdjtTEiHrh52zsVjBUi4tjb3BJj9CPyOaY_vMSxV8kQsiE2/exec";
+
     createApp({
       setup() {
         const currentView = ref('login'); 
@@ -573,6 +583,7 @@
         const isSaving = ref(false);
         const isRegSuccess = ref(false);
         const isProfileLinkCopied = ref(false);
+        const isPublishingWeb = ref(false);
 
         const toast = ref({ show: false, message: '', type: 'success' });
         const showToast = (msg, type = 'success') => { 
@@ -592,7 +603,26 @@
             confirmModal.value.show = false; 
         };
 
-        const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzv1iBsoI7jo4rMH3dxoxdjtTEiHrh52zsVjBUi4tjb3BJj9CPyOaY_vMSxV8kQsiE2/exec';
+        // 🏆 核心變更：將原本的 google.script.run 完全替換為原生 fetch 請求
+        const apiCall = async (payload) => {
+          try {
+            const response = await fetch(GAS_API_URL, {
+              method: 'POST',
+              body: JSON.stringify(payload),
+              // 使用 text/plain 可避免 GAS 引發 CORS preflight 限制
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+            });
+            const resText = await response.text();
+            try {
+              return JSON.parse(resText);
+            } catch (e) {
+              return resText; // 處理非 JSON 的意外回傳
+            }
+          } catch (err) {
+            showToast('伺服器連線異常，請稍後再試', 'error');
+            throw err;
+          }
+        };
         
         const colorMatrix = ref([
             ['#fef2f2', '#fca5a5', '#ef4444', '#b91c1c', '#7f1d1d'], 
@@ -634,13 +664,10 @@
                 return { type: 'share', value: decodeURIComponent(url.split('text=')[1]) };
             }
             if (url.includes('line.me/R/msg/text/?')) return { type: 'share', value: decodeURIComponent(url.split('line.me/R/msg/text/?')[1]) };
-            
             if (url.includes('liff.line.me') && url.includes('autoShare=true')) {
                 return { type: 'share', value: url };
             }
-            
             if (url.includes('line.me') && !url.includes('liff.line.me')) return { type: 'line', value: url }; 
-            
             if (url.includes('facebook.com') || url.includes('instagram.com') || url.includes('youtube.com')) return { type: 'social', value: url };
             return { type: 'url', value: url };
         };
@@ -671,7 +698,7 @@
         const handleTypeChange = (item) => {
             if (item.type === 'share') {
                 const liffId = "2009561347-VUhbtrEC"; 
-                item.linkValue = `https://liff.line.me/${liffId}?id=${currentUser.value.memberId}&autoShare=true`;
+                item.linkValue = 'https://liff.line.me/' + liffId + '?id=' + currentUser.value.memberId + '&autoShare=true';
             }
         };
 
@@ -697,17 +724,7 @@
         const isUploading = ref(false);
         let cropperInstance = null;
 
-        const createUniqueId = (prefix) => `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).substr(2, 8)}`;
-
-        const apiCall = async (payload) => {
-          try { 
-              const res = await fetch(GAS_API_URL, { method: 'POST', body: JSON.stringify(payload) }); 
-              return await res.json(); 
-          } catch (e) { 
-              showToast('網路異常', 'error'); 
-              throw e; 
-          }
-        };
+        const createUniqueId = (prefix) => prefix + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 8);
 
         const autoResize = (id) => { 
             const el = document.getElementById(id); 
@@ -875,6 +892,31 @@
                 if(res.status === 'success') showToast('輪播變更已發佈'); 
                 else showToast('發佈失敗', 'error');
             } finally { isSaving.value = false; }
+        };
+
+        const publishToWeb = async () => {
+            isPublishingWeb.value = true;
+            try {
+                const payloadButtons = buttons.value.map(b => ({ ...b, url: buildFinalLink(b.type, b.linkValue) }));
+                await apiCall({ action: 'saveAll', memberId: currentUser.value.memberId, profile: profile.value, buttons: payloadButtons });
+                
+                const res = await apiCall({ action: 'publishToWeb', memberId: currentUser.value.memberId });
+                
+                if (res.status === 'success') {
+                    showToast('🎉 公開網頁發佈成功！網址已為您複製');
+                    try {
+                        await navigator.clipboard.writeText(res.url);
+                    } catch(e) {
+                        prompt("您的公開專屬網址已成功發佈！請複製以下連結：", res.url);
+                    }
+                } else {
+                    showToast('發佈失敗: ' + res.message, 'error');
+                }
+            } catch (e) {
+                showToast('發佈異常，請檢查網路連線', 'error');
+            } finally {
+                isPublishingWeb.value = false;
+            }
         };
 
         const executeActualDelete = async (type, id, index) => {
@@ -1055,8 +1097,8 @@
         const shareProfilePage = async () => {
             if (!currentUser.value) return;
             const liffId = "2009561347-VUhbtrEC"; 
-            const shareUrl = `https://liff.line.me/${liffId}?id=${currentUser.value.memberId}`;
-            const shareText = `哈囉！這是「${profile.value.name || currentUser.value.name}」的電子名片，請點擊連結查看：\n${shareUrl}`;
+            const shareUrl = 'https://liff.line.me/' + liffId + '?id=' + currentUser.value.memberId;
+            const shareText = '哈囉！這是「' + (profile.value.name || currentUser.value.name) + '」的電子名片，請點擊連結查看：\n' + shareUrl;
             
             try {
                 await navigator.clipboard.writeText(shareText);
@@ -1086,7 +1128,7 @@
           profile, buttons, slides, addNewButton, addNewSlide, duplicateSlide, moveItem, insertNewButton, insertNewSlide,
           isMediaModalOpen, mediaImages, isLoadingImages, openMediaLibrary, closeMediaLibrary, selectImage,
           handleFileSelect, deleteGalleryImage, isCropModalOpen, isUploading, closeCropper, confirmCropAndUpload,
-          isProfileLinkCopied, shareProfilePage
+          isProfileLinkCopied, shareProfilePage, isPublishingWeb, publishToWeb
         };
       }
     }).mount('#app');
