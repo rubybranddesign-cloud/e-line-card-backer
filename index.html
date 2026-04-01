@@ -1059,14 +1059,16 @@
 
         const shareProfilePage = async () => {
             if (!currentUser.value) return;
-            const liffId = "2009561347-VUhbtrEC"; 
-            const shareUrl = `https://liff.line.me/${liffId}?id=${currentUser.value.memberId}`;
+            
+            // 🎯 修改為直接複製專屬的 GitHub 靜態 HTML 路徑
+            const shareUrl = `https://rubybranddesign-cloud.github.io/e-line-card-share/card/${currentUser.value.memberId}/`;
+            
             const shareText = `哈囉！這是「${profile.value.name || currentUser.value.name}」的電子名片，請點擊連結查看：\n${shareUrl}`;
             
             try {
                 await navigator.clipboard.writeText(shareText);
                 isProfileLinkCopied.value = true;
-                showToast('✨ 專屬網址與文字已複製成功！您可以直接貼到 LINE 聊天室中');
+                showToast('✨ 專屬網址與文字已複製成功！您可以直接貼到聊天室中');
                 setTimeout(() => { isProfileLinkCopied.value = false; }, 2000);
             } catch (err) {
                 const input = document.createElement('textarea');
@@ -1077,7 +1079,7 @@
                 document.body.removeChild(input);
                 
                 isProfileLinkCopied.value = true;
-                showToast('✨ 專屬網址與文字已複製成功！您可以直接貼到 LINE 聊天室中');
+                showToast('✨ 專屬網址與文字已複製成功！您可以直接貼到聊天室中');
                 setTimeout(() => { isProfileLinkCopied.value = false; }, 2000);
             }
         };
