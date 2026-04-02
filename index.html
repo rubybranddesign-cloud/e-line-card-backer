@@ -1123,8 +1123,8 @@
 
         const shareProfilePage = async () => {
             if (!currentUser.value) return;
-            const liffId = "2009561347-VUhbtrEC"; 
-            const shareUrl = 'https://liff.line.me/' + liffId + '?id=' + currentUser.value.memberId;
+            // 直接組成專屬的 GitHub Pages 靜態網址
+            const shareUrl = 'https://rubybranddesign-cloud.github.io/e-line-card-share/' + currentUser.value.memberId + '/';
             const shareText = '哈囉！這是「' + (profile.value.name || currentUser.value.name) + '」的電子名片，請點擊連結查看：\n' + shareUrl;
             
             try {
