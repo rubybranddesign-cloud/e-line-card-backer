@@ -181,8 +181,8 @@
                                 <a v-if="profile.tiktokUrl" :href="profile.tiktokUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-tiktok-logo text-[28px]"></i></a>
                             </div>
 
-                            <div v-if="profile.ytUrl && getYoutubeEmbedUrl(profile.ytUrl)" class="w-full mt-4 mb-2 rounded-xl overflow-hidden shadow-lg aspect-video bg-black shrink-0 border border-white/20">
-                                <iframe :src="'https://www.youtube.com/embed/' + getYoutubeEmbedUrl(profile.ytUrl)" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                            <div v-if="profile.ytUrl && getVideoData(profile.ytUrl)" class="w-full mt-4 mb-2 rounded-xl overflow-hidden shadow-lg aspect-video bg-black shrink-0 border border-white/20">
+                                <iframe :src="getVideoData(profile.ytUrl).embedUrl" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                             </div>
 
                             <div class="w-full mt-5 space-y-3 pb-6">
@@ -195,20 +195,20 @@
                                 </a>
                             </div>
                             
-                            <div v-if="slides && slides.length > 0" class="w-full mt-4 pb-10">
-                                <div class="flex items-center gap-3 mb-5 px-2">
+                            <div v-if="slides && slides.length > 0" class="w-full mt-2 pb-10">
+                                <div class="flex items-center gap-3 mb-4 px-2">
                                     <div class="h-[1px] flex-1 bg-black/10" :style="{ backgroundColor: profile.textColor, opacity: 0.15 }"></div>
-                                    <span class="text-xs font-black tracking-widest uppercase" :style="{ color: profile.textColor, opacity: 0.6 }">Highlights</span>
+                                    <span class="text-[10px] font-black tracking-widest uppercase" :style="{ color: profile.textColor, opacity: 0.6 }">Highlights</span>
                                     <div class="h-[1px] flex-1 bg-black/10" :style="{ backgroundColor: profile.textColor, opacity: 0.15 }"></div>
                                 </div>
-                                <div class="flex gap-4 overflow-x-auto no-scrollbar px-2 pb-6 snap-x snap-mandatory items-stretch">
-                                    <div v-for="slide in slides" :key="slide.id" class="snap-center shrink-0 w-[245px] rounded-[24px] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20 flex flex-col relative transform transition hover:-translate-y-1" :style="{ backgroundColor: slide.bgColor || '#ffffff' }">
-                                        <div class="w-full aspect-[1080/1680] bg-gray-100 relative overflow-hidden border-b border-gray-100/50">
+                                <div class="flex gap-4 overflow-x-auto no-scrollbar px-2 pb-6 snap-x snap-mandatory">
+                                    <div v-for="slide in slides" :key="slide.id" class="snap-center shrink-0 w-[200px] rounded-2xl overflow-hidden shadow-lg border border-white/40 flex flex-col relative transform transition" :style="{ backgroundColor: slide.bgColor || '#ffffff' }">
+                                        <div class="w-full aspect-[4/5] bg-gray-100 relative overflow-hidden border-b border-gray-100/50">
                                             <img v-if="slide.imageUrl" :src="slide.imageUrl" class="absolute inset-0 w-full h-full object-cover">
-                                            <div v-else class="absolute inset-0 flex items-center justify-center text-gray-300 bg-gray-50"><i class="ph-fill ph-image text-4xl"></i></div>
+                                            <div v-else class="absolute inset-0 flex items-center justify-center text-gray-300 bg-gray-50"><i class="ph-fill ph-image text-3xl"></i></div>
                                         </div>
-                                        <div v-if="slide.buttons && slide.buttons.length > 0" class="pt-[13px] pb-[12px] px-[8px] flex flex-col gap-[10px] w-full relative z-10 flex-1 justify-end">
-                                            <a v-for="(sBtn, bIdx) in slide.buttons" :key="bIdx" :href="buildFinalLink(sBtn.type, sBtn.linkValue)" target="_blank" class="w-full text-center py-[10px] rounded-lg text-[14px] font-bold shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200" :style="{ backgroundColor: sBtn.color || '#6C0B22', color: slide.buttonTextColor || '#ffffff', fontFamily: getFontFamily(slide.buttonFont) }">
+                                        <div v-if="slide.buttons && slide.buttons.length > 0" class="p-3 flex flex-col gap-2 relative z-10 w-full">
+                                            <a v-for="(sBtn, bIdx) in slide.buttons" :key="bIdx" :href="buildFinalLink(sBtn.type, sBtn.linkValue)" target="_blank" class="w-full text-center py-2 rounded-lg text-[12px] font-bold shadow-sm hover:scale-[1.02] active:scale-95 transition-all" :style="{ backgroundColor: sBtn.color || '#6C0B22', color: slide.buttonTextColor || '#ffffff', fontFamily: getFontFamily(slide.buttonFont) }">
                                                 {{ sBtn.title || '按鈕文字' }}
                                             </a>
                                         </div>
@@ -316,8 +316,8 @@
                                 <input v-model="profile.tiktokUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="TikTok 連結">
                             </div>
                             <div class="flex items-center gap-2 mt-4 pt-4 border-t border-gray-100">
-                                <i class="ph-fill ph-youtube-logo text-red-500 text-2xl w-6"></i>
-                                <div class="flex-1"><input v-model="profile.ytUrl" class="w-full text-xs p-2.5 rounded-lg border bg-red-50 outline-none focus:ring-1 focus:ring-red-400" placeholder="YouTube 影片網址 (會自動顯示播放器)"></div>
+                                <i class="ph-fill ph-video-camera text-gray-800 text-2xl w-6"></i>
+                                <div class="flex-1"><input v-model="profile.ytUrl" class="w-full text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="影音連結 (支援 YouTube 或 Vimeo)"></div>
                             </div>
                         </div>
                     </div>
@@ -412,15 +412,15 @@
                         <div class="mt-auto flex flex-col pb-6 w-full">
                             <div v-if="slides.length === 0" class="text-center text-white/50 text-sm mt-10">尚無輪播卡片，請從編輯區新增</div>
                             <div v-else class="line-carousel-container no-scrollbar items-stretch">
-                                <div v-for="slide in slides" :key="slide.id" class="line-card flex flex-col shrink-0" :style="{ backgroundColor: slide.bgColor || '#ffffff', borderRadius: '16px' }">
-                                    <div class="relative w-full aspect-[1080/1680] bg-gray-100 overflow-hidden shrink-0 border-b border-gray-100/50">
+                                <div v-for="slide in slides" :key="slide.id" class="line-card flex flex-col shrink-0" :style="{ backgroundColor: slide.bgColor || '#ffffff' }">
+                                    <div class="relative w-full aspect-[2/3] bg-gray-100 overflow-hidden shrink-0 border-b border-gray-100/50">
                                         <img v-if="slide.imageUrl" :src="slide.imageUrl" class="absolute inset-0 w-full h-full object-cover object-center">
                                         <div v-else class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 bg-gray-200">
-                                            <i class="ph-fill ph-image text-4xl mb-2"></i><span class="text-[10px] font-bold px-4 text-center">1080x1680 完美比例<br>滿版極致邊距排版</span>
+                                            <i class="ph ph-image text-4xl mb-2"></i><span class="text-[10px] font-bold px-4 text-center">固定比例滿版區 (4:6)<br>按鈕將緊貼於此區域下方</span>
                                         </div>
                                     </div>
-                                    <div class="flex flex-col flex-1 justify-end pt-[13px] pb-[12px] px-[8px] gap-[10px]" :style="{ backgroundColor: slide.bgColor || '#ffffff' }">
-                                        <a v-for="(sBtn, bIdx) in slide.buttons" :key="bIdx" :href="buildFinalLink(sBtn.type, sBtn.linkValue)" target="_blank" class="rounded-lg py-[10px] text-center text-[14px] font-bold hover:opacity-90 transition" :style="{ backgroundColor: sBtn.color || '#6C0B22', color: slide.buttonTextColor || '#ffffff', fontFamily: getFontFamily(slide.buttonFont) }">
+                                    <div class="flex flex-col gap-2 p-3 flex-1" :style="{ backgroundColor: slide.bgColor || '#ffffff' }">
+                                        <a v-for="(sBtn, bIdx) in slide.buttons" :key="bIdx" :href="buildFinalLink(sBtn.type, sBtn.linkValue)" target="_blank" class="rounded-xl p-3 text-center text-[15px] font-bold hover:opacity-80 transition" :style="{ backgroundColor: sBtn.color || '#6C0B22', color: slide.buttonTextColor || '#ffffff', fontFamily: getFontFamily(slide.buttonFont) }">
                                             {{ sBtn.title || '按鈕文字' }}
                                         </a>
                                     </div>
@@ -581,11 +581,10 @@
   </div>
 
   <script>
-    // 👇👇👇 核心部署設定：請貼上您最新部署的 Google Apps Script 網頁應用程式網址 👇👇👇
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwKN7tVF5tnRIIHDGyQ3KElB_BNstGbrWOikDG69EVB-pflciYpVCyVjLStZxpUMQvs/exec"; 
-    // 👆👆👆 ==================================================================== 👆👆👆
-
     const { createApp, ref, onMounted, nextTick } = Vue;
+    
+    // 👇👇👇 在此填入你部署好的 GAS 網址 👇👇👇
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwKN7tVF5tnRIIHDGyQ3KElB_BNstGbrWOikDG69EVB-pflciYpVCyVjLStZxpUMQvs/exec";
 
     createApp({
       setup() {
@@ -626,20 +625,22 @@
             confirmModal.value.show = false; 
         };
 
-        // 🚀 原生 Fetch 取代 google.script.run，完美支援 GitHub Pages 部署
+        // 修改為 Fetch API，無縫串接 GAS
         const apiCall = async (payload) => {
-          try {
-            const response = await fetch(GAS_API_URL, {
-                method: 'POST',
-                // 使用字串化傳遞，GAS 的 doPost 將會攔截並解析 e.postData.contents
-                body: JSON.stringify(payload)
-            });
-            const resData = await response.json();
-            return resData;
-          } catch (err) {
-            showToast('伺服器連線異常，請稍後再試', 'error');
-            throw err;
-          }
+            try {
+                const response = await fetch(GAS_API_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "text/plain;charset=utf-8",
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                return data;
+            } catch (err) {
+                showToast('伺服器連線異常，請稍後再試', 'error');
+                throw err;
+            }
         };
         
         const colorMatrix = ref([
@@ -666,11 +667,19 @@
             return map[type] || '輸入內容';
         };
 
-        const getYoutubeEmbedUrl = (url) => {
+        const getVideoData = (url) => {
             if (!url) return null;
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
+            const ytRegExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const ytMatch = url.match(ytRegExp);
+            if (ytMatch && ytMatch[2].length === 11) {
+                return { type: 'youtube', embedUrl: 'https://www.youtube.com/embed/' + ytMatch[2] };
+            }
+            const vimeoRegExp = /(?:vimeo\.com\/|player\.vimeo\.com\/video\/)([0-9]+)/;
+            const vimeoMatch = url.match(vimeoRegExp);
+            if (vimeoMatch && vimeoMatch[1]) {
+                return { type: 'vimeo', embedUrl: 'https://player.vimeo.com/video/' + vimeoMatch[1] + '?title=0&byline=0&portrait=0' };
+            }
+            return null;
         };
 
         const parseLink = (url) => {
@@ -1112,10 +1121,10 @@
             isMediaModalOpen.value = false; 
         };
 
-        // 🚀 優化 1：直接複製 GitHub Pages 的專屬網址
         const shareProfilePage = async () => {
             if (!currentUser.value) return;
-            const shareUrl = 'https://rubybranddesign-cloud.github.io/e-line-card-share/' + currentUser.value.memberId + '/';
+            const liffId = "2009561347-VUhbtrEC"; 
+            const shareUrl = 'https://liff.line.me/' + liffId + '?id=' + currentUser.value.memberId;
             const shareText = '哈囉！這是「' + (profile.value.name || currentUser.value.name) + '」的電子名片，請點擊連結查看：\n' + shareUrl;
             
             try {
@@ -1139,7 +1148,7 @@
 
         return { 
           currentView, activeTab, currentUser, loginForm, regForm, forgotForm, isRegSuccess, colorMatrix,
-          buttonTypes, getPlaceholder, buildFinalLink, getFontFamily, handleTypeChange, getYoutubeEmbedUrl,
+          buttonTypes, getPlaceholder, buildFinalLink, getFontFamily, handleTypeChange, getVideoData,
           mobileViewModeProfile, mobileViewModeSlide, activePaletteId, togglePalette,
           isLoading, isFetchingData, isSaving, toast, confirmModal, requestDelete, executeConfirm,
           handleLogin, handleRegister, handleForgotPassword, logout, saveAllData, saveSlidesData, autoResize,
