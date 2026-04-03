@@ -184,7 +184,7 @@
                             <div v-if="profile.ytUrl && getVideoData(profile.ytUrl)" class="relative w-full mt-4 mb-2 rounded-xl overflow-hidden shadow-lg aspect-video bg-black shrink-0 border border-white/20">
     <iframe 
         :src="getVideoData(profile.ytUrl).embedUrl" 
-        :class="getVideoData(profile.ytUrl).type === 'gdrive' ? 'absolute -top-[50px] left-0 w-full h-[calc(100%+50px)]' : 'w-full h-full'" 
+        :class="getVideoData(profile.ytUrl).type === 'gdrive' ? 'absolute -top-[50px] left-0 w-full h-[calc(100%+100px)]' : 'w-full h-full'" 
         frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
     </iframe>
 </div>
