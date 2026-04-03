@@ -319,8 +319,7 @@
                             </div>
                             <div class="flex items-center gap-2 mt-4 pt-4 border-t border-gray-100">
                                 <i class="ph-fill ph-video-camera text-gray-800 text-2xl w-6"></i>
-                                <div class="flex-1"><input v-model="profile.ytUrl" class="w-full text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="影音連結 (支援 YouTube 或 Vimeo)"></div>
-                            </div>
+                                <input v-model="profile.ytUrl" class="w-full text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="影音連結 (YouTube, Vimeo, Google雲端 或 MP4)">                            </div>
                         </div>
                     </div>
 
@@ -671,16 +670,33 @@
 
         const getVideoData = (url) => {
             if (!url) return null;
+            
+            // 1. 支援 YouTube
             const ytRegExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
             const ytMatch = url.match(ytRegExp);
             if (ytMatch && ytMatch[2].length === 11) {
                 return { type: 'youtube', embedUrl: 'https://www.youtube.com/embed/' + ytMatch[2] };
             }
+            
+            // 2. 支援 Vimeo
             const vimeoRegExp = /(?:vimeo\.com\/|player\.vimeo\.com\/video\/)([0-9]+)/;
             const vimeoMatch = url.match(vimeoRegExp);
             if (vimeoMatch && vimeoMatch[1]) {
                 return { type: 'vimeo', embedUrl: 'https://player.vimeo.com/video/' + vimeoMatch[1] + '?title=0&byline=0&portrait=0' };
             }
+
+            // 3. 支援 Google Drive (自動擷取 ID 並轉換為預覽模式)
+            const driveRegExp = /drive\.google\.com\/(?:file\/d\/|open\?id=)([a-zA-Z0-9_-]+)/;
+            const driveMatch = url.match(driveRegExp);
+            if (driveMatch && driveMatch[1]) {
+                return { type: 'gdrive', embedUrl: 'https://drive.google.com/file/d/' + driveMatch[1] + '/preview' };
+            }
+
+            // 4. 支援一般雲端直連影片 (結尾為 .mp4, .webm 等)
+            if (url.match(/\.(mp4|webm|ogg)$/i)) {
+                return { type: 'generic', embedUrl: url };
+            }
+
             return null;
         };
 
