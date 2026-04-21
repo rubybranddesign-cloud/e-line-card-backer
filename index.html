@@ -660,14 +660,24 @@
         ]);
 
         const buttonTypes = ref([
-            { val: 'url', label: '網頁連結' }, { val: 'line', label: 'LINE 加好友' }, { val: 'share', label: '轉發LINE好友' },
-            { val: 'social', label: '社群媒體' }, { val: 'tel', label: '電話撥打' }, { val: 'email', label: '發送郵件' }
+            { val: 'url', label: '網頁連結' }, 
+            { val: 'line', label: '+官方LINE' }, 
+            { val: 'line_personal', label: '+個人LINE' }, 
+            { val: 'share', label: '轉發LINE好友' },
+            { val: 'social', label: '社群媒體' }, 
+            { val: 'tel', label: '電話撥打' }, 
+            { val: 'email', label: '發送郵件' }
         ]);
 
         const getPlaceholder = (type) => {
             const map = { 
-                'url': '連結網址 (https://...)', 'tel': '電話號碼 (09...)', 'email': '電子郵件', 
-                'line': '輸入 LINE ID (需包含 @)', 'share': '系統已自動帶入專屬轉發網址', 'social': 'FB/IG 連結' 
+                'url': '連結網址 (https://...)', 
+                'tel': '電話號碼 (09...)', 
+                'email': '電子郵件', 
+                'line': '輸入官方 LINE ID (請務必包含 @)', 
+                'line_personal': '輸入個人 LINE ID (不需包含 @)', 
+                'share': '系統已自動帶入專屬轉發網址', 
+                'social': 'FB/IG 連結' 
             };
             return map[type] || '輸入內容';
         };
@@ -717,7 +727,8 @@ const getVideoData = (url) => {
                 }
                 return 'https://social-plugins.line.me/lineit/share?text=' + encodeURIComponent(value);
             }
-            if (type === 'line') {
+            // 👇 這裡新增了 || type === 'line_personal'
+            if (type === 'line' || type === 'line_personal') {
                 if (value.startsWith('http')) return value;
                 return 'https://line.me/ti/p/~' + value.replace('@', '%40'); 
             }
