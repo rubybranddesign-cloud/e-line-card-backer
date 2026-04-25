@@ -182,12 +182,9 @@
                             </div>
 
                             <div v-if="profile.ytUrl && getVideoData(profile.ytUrl)" class="relative w-full mt-4 mb-2 rounded-xl overflow-hidden shadow-lg aspect-video bg-black shrink-0 border border-white/20">
-    
-    <iframe v-if="getVideoData(profile.ytUrl).type !== 'html5'" :src="getVideoData(profile.ytUrl).embedUrl" class="absolute inset-0 w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-    
-    <video v-if="getVideoData(profile.ytUrl).type === 'html5'" :src="getVideoData(profile.ytUrl).embedUrl" class="absolute inset-0 w-full h-full" controls playsinline controlslist="nodownload"></video>
-
-</div>
+                                <iframe v-if="getVideoData(profile.ytUrl).type !== 'html5'" :src="getVideoData(profile.ytUrl).embedUrl" class="absolute inset-0 w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                <video v-if="getVideoData(profile.ytUrl).type === 'html5'" :src="getVideoData(profile.ytUrl).embedUrl" class="absolute inset-0 w-full h-full" controls playsinline controlslist="nodownload"></video>
+                            </div>
 
                             <div class="w-full mt-5 space-y-3 pb-6">
                                 <a v-for="btn in buttons" :key="btn.id" 
@@ -207,18 +204,18 @@
                                 </div>
                                 <div class="flex gap-4 overflow-x-auto no-scrollbar px-2 pb-6 snap-x snap-mandatory">
                                     <div v-for="slide in slides" :key="slide.id" class="line-card flex flex-col shrink-0" :style="{ backgroundColor: slide.bgColor || '#ffffff' }">
-    <div class="relative w-full aspect-[1080/1680] bg-gray-100 overflow-hidden shrink-0 border-b border-gray-100/50">
-        <img v-if="slide.imageUrl" :src="slide.imageUrl" class="absolute inset-0 w-full h-full object-cover object-center">
-        <div v-else class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 bg-gray-200">
-            <i class="ph ph-image text-4xl mb-2"></i><span class="text-[10px] font-bold px-4 text-center">固定比例 (1080x1680)<br>極致滿版設計</span>
-        </div>
-    </div>
-    <div class="flex flex-col gap-[10px] pt-[13px] pb-[12px] px-[8px] flex-1" :style="{ backgroundColor: slide.bgColor || '#ffffff' }">
-        <a v-for="(sBtn, bIdx) in slide.buttons" :key="bIdx" :href="buildFinalLink(sBtn.type, sBtn.linkValue)" target="_blank" class="rounded-lg py-[10px] text-center text-[14px] font-bold hover:opacity-80 transition" :style="{ backgroundColor: sBtn.color || '#6C0B22', color: slide.buttonTextColor || '#ffffff', fontFamily: getFontFamily(slide.buttonFont) }">
-            {{ sBtn.title || '按鈕文字' }}
-        </a>
-    </div>
-</div>
+                                        <div class="relative w-full aspect-[1080/1680] bg-gray-100 overflow-hidden shrink-0 border-b border-gray-100/50">
+                                            <img v-if="slide.imageUrl" :src="slide.imageUrl" class="absolute inset-0 w-full h-full object-cover object-center">
+                                            <div v-else class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 bg-gray-200">
+                                                <i class="ph ph-image text-4xl mb-2"></i><span class="text-[10px] font-bold px-4 text-center">固定比例 (1080x1680)<br>極致滿版設計</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex flex-col gap-[10px] pt-[13px] pb-[12px] px-[8px] flex-1" :style="{ backgroundColor: slide.bgColor || '#ffffff' }">
+                                            <a v-for="(sBtn, bIdx) in slide.buttons" :key="bIdx" :href="buildFinalLink(sBtn.type, sBtn.linkValue)" target="_blank" class="rounded-lg py-[10px] text-center text-[14px] font-bold hover:opacity-80 transition" :style="{ backgroundColor: sBtn.color || '#6C0B22', color: slide.buttonTextColor || '#ffffff', fontFamily: getFontFamily(slide.buttonFont) }">
+                                                {{ sBtn.title || '按鈕文字' }}
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -436,6 +433,31 @@
                 </div>
 
                 <div class="w-full max-w-full lg:w-[550px] min-w-0" :class="{'hidden lg:block': mobileViewModeSlide === 'preview'}">
+                    
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 mb-6 w-full min-w-0">
+                        <h3 class="font-black text-base mb-4 text-gray-800 border-b pb-2 flex items-center gap-2">
+                            <i class="ph-fill ph-plug text-green-500"></i> LINE 官方帳號自動化串接
+                        </h3>
+                        <div class="flex flex-col gap-4">
+                            <div>
+                                <label class="text-[11px] font-bold text-gray-500 mb-1 block">1. LINE Channel Access Token</label>
+                                <input v-model="profile.lineToken" type="password" class="w-full text-xs p-2.5 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-green-400 bg-gray-50" placeholder="請貼上您 LINE Developers 後台的長串金鑰">
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-bold text-gray-500 mb-1 block">2. 您的專屬 Webhook 網址 (請複製並貼到 LINE 後台)</label>
+                                <div class="relative">
+                                    <input :value="GAS_API_URL + '?memberId=' + (currentUser ? currentUser.memberId : '')" readonly class="w-full text-[10px] p-3 rounded-xl border border-gray-200 bg-gray-100 text-gray-500 font-mono pr-20" id="webhook-url">
+                                    <button @click="copyWebhookUrl" class="absolute right-1 top-1 bottom-1 px-3 bg-green-500 hover:bg-green-600 text-white text-[10px] font-bold rounded-lg transition">一鍵複製</button>
+                                </div>
+                                <p class="text-[10px] text-gray-400 mt-1">*請將此網址貼至 LINE Official Account Manager 的 Webhook 欄位，並確保已開啟 Webhook 功能。</p>
+                            </div>
+                            <button @click="saveLineToken" :disabled="isSavingToken" class="w-full mt-2 bg-green-50 text-green-600 border border-green-200 font-bold py-2.5 rounded-xl hover:bg-green-100 transition flex justify-center items-center gap-2 text-sm">
+                                <i v-if="isSavingToken" class="ph ph-spinner animate-spin"></i>
+                                {{ isSavingToken ? '儲存中...' : '儲存 LINE 串接設定' }}
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 w-full min-w-0">
                         <div class="flex justify-between items-center border-b pb-4 mb-4">
                             <h3 class="font-black text-lg text-gray-800">輪播卡片編輯</h3>
@@ -608,6 +630,7 @@
         const isLoading = ref(false);
         const isFetchingData = ref(false);
         const isSaving = ref(false);
+        const isSavingToken = ref(false);
         const isRegSuccess = ref(false);
         const isProfileLinkCopied = ref(false);
         const isPublishingWeb = ref(false);
@@ -682,7 +705,7 @@
             return map[type] || '輸入內容';
         };
 
-const getVideoData = (url) => {
+        const getVideoData = (url) => {
             if (!url) return null;
             const ytMatch = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/);
             if (ytMatch && ytMatch[2].length === 11) return { type: 'youtube', embedUrl: 'https://www.youtube.com/embed/' + ytMatch[2] };
@@ -727,7 +750,6 @@ const getVideoData = (url) => {
                 }
                 return 'https://social-plugins.line.me/lineit/share?text=' + encodeURIComponent(value);
             }
-            // 👇 這裡新增了 || type === 'line_personal'
             if (type === 'line' || type === 'line_personal') {
                 if (value.startsWith('http')) return value;
                 return 'https://line.me/ti/p/~' + value.replace('@', '%40'); 
@@ -750,7 +772,7 @@ const getVideoData = (url) => {
 
         const profile = ref({ 
             avatarUrl: '', name: '', bio: '', bgColor: '#dddddd', bgImageUrl: '', textColor: '#1a1a1a', 
-            socialIconColor: '#000000', fbUrl: '', igUrl: '', lineUrl: '', tiktokUrl: '', ytUrl: '', wechatUrl: ''
+            socialIconColor: '#000000', fbUrl: '', igUrl: '', lineUrl: '', tiktokUrl: '', ytUrl: '', wechatUrl: '', lineToken: ''
         });
         const buttons = ref([]);
         const slides = ref([]); 
@@ -914,6 +936,39 @@ const getVideoData = (url) => {
             cloned.id = createUniqueId('sld'); 
             slides.value.splice(index + 1, 0, cloned);
             showToast('已成功複製卡片');
+        };
+
+        const saveLineToken = async () => {
+            if (!profile.value.lineToken) {
+                showToast('請先填寫 LINE Token', 'error');
+                return;
+            }
+            isSavingToken.value = true;
+            try {
+                const res = await apiCall({ action: 'saveLineToken', memberId: currentUser.value.memberId, lineToken: profile.value.lineToken });
+                if (res.status === 'success') {
+                    showToast('LINE 串接設定已成功儲存！');
+                } else {
+                    showToast('儲存失敗：' + res.message, 'error');
+                }
+            } catch (e) {
+                showToast('伺服器連線異常', 'error');
+            } finally {
+                isSavingToken.value = false;
+            }
+        };
+
+        const copyWebhookUrl = async () => {
+            const url = GAS_API_URL + '?memberId=' + currentUser.value.memberId;
+            try {
+                await navigator.clipboard.writeText(url);
+                showToast('Webhook 網址已複製！');
+            } catch (err) {
+                const input = document.getElementById('webhook-url');
+                input.select();
+                document.execCommand('copy');
+                showToast('Webhook 網址已複製！');
+            }
         };
 
         const saveAllData = async () => {
@@ -1169,12 +1224,12 @@ const getVideoData = (url) => {
           currentView, activeTab, currentUser, loginForm, regForm, forgotForm, isRegSuccess, colorMatrix,
           buttonTypes, getPlaceholder, buildFinalLink, getFontFamily, handleTypeChange, getVideoData,
           mobileViewModeProfile, mobileViewModeSlide, activePaletteId, togglePalette,
-          isLoading, isFetchingData, isSaving, toast, confirmModal, requestDelete, executeConfirm,
-          handleLogin, handleRegister, handleForgotPassword, logout, saveAllData, saveSlidesData, autoResize,
+          isLoading, isFetchingData, isSaving, isSavingToken, toast, confirmModal, requestDelete, executeConfirm,
+          handleLogin, handleRegister, handleForgotPassword, logout, saveAllData, saveSlidesData, saveLineToken, copyWebhookUrl, autoResize,
           profile, buttons, slides, addNewButton, addNewSlide, duplicateSlide, moveItem, insertNewButton, insertNewSlide,
           isMediaModalOpen, mediaImages, isLoadingImages, openMediaLibrary, closeMediaLibrary, selectImage,
           handleFileSelect, deleteGalleryImage, isCropModalOpen, isUploading, closeCropper, confirmCropAndUpload,
-          isProfileLinkCopied, shareProfilePage, isPublishingWeb, publishToWeb
+          isProfileLinkCopied, shareProfilePage, isPublishingWeb, publishToWeb, GAS_API_URL
         };
       }
     }).mount('#app');
