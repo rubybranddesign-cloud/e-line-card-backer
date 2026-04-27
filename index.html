@@ -653,7 +653,6 @@
             confirmModal.value.show = false; 
         };
 
-        // 修改為 Fetch API，無縫串接 GAS
         const apiCall = async (payload) => {
             try {
                 const response = await fetch(GAS_API_URL, {
@@ -713,11 +712,9 @@
             const vimeoMatch = url.match(/(?:vimeo\.com\/|player\.vimeo\.com\/video\/)([0-9]+)/);
             if (vimeoMatch && vimeoMatch[1]) return { type: 'vimeo', embedUrl: 'https://player.vimeo.com/video/' + vimeoMatch[1] + '?title=0&byline=0&portrait=0' };
             
-            // 🔥 Google Drive 轉換為直連串流 (HTML5 Video)
             const driveMatch = url.match(/drive\.google\.com\/(?:file\/d\/|open\?id=)([a-zA-Z0-9_-]+)/);
             if (driveMatch && driveMatch[1]) return { type: 'html5', embedUrl: 'https://drive.google.com/uc?export=download&id=' + driveMatch[1] };
             
-            // 🔥 一般 MP4 直連
             if (url.match(/\.(mp4|webm|ogg)$/i)) return { type: 'html5', embedUrl: url };
             
             return null;
@@ -822,6 +819,8 @@
                 if(sRes.status === 'success') {
                     slides.value = sRes.data.map(s => ({
                         ...s,
+                        // 🚀 確保資料回來時，如果有少 ID，幫忙補上
+                        id: s.id || createUniqueId('sld'),
                         buttons: s.buttons.map(b => {
                             const parsed = parseLink(b.url);
                             return { ...b, type: b.type || parsed.type, title: b.text, linkValue: parsed.value };
@@ -975,7 +974,7 @@
             isSaving.value = true; 
             activePaletteId.value = null;
             try {
-                const payloadButtons = buttons.value.map(b => ({ ...b, url: buildFinalLink(b.type, b.linkValue) }));
+                const payloadButtons = buttons.value.map(b => ({ ...b, id: b.id || createUniqueId('btn'), url: buildFinalLink(b.type, b.linkValue) }));
                 const res = await apiCall({ action: 'saveAll', memberId: currentUser.value.memberId, profile: profile.value, buttons: payloadButtons });
                 if(res.status === 'success') showToast('Profile 已同步更新'); 
                 else showToast('儲存失敗', 'error');
@@ -987,7 +986,9 @@
             activePaletteId.value = null;
             try {
                 const payloadSlides = slides.value.map(s => ({
-                    ...s, buttons: s.buttons.map(b => ({ text: b.title, color: b.color, type: b.type, clicks: b.clicks, url: buildFinalLink(b.type, b.linkValue) }))
+                    ...s, 
+                    id: s.id || createUniqueId('sld'), // 防呆：確保一定要送 ID 出去
+                    buttons: s.buttons.map(b => ({ text: b.title, color: b.color, type: b.type, clicks: b.clicks, url: buildFinalLink(b.type, b.linkValue) }))
                 }));
                 const res = await apiCall({ action: 'saveSlides', memberId: currentUser.value.memberId, slides: payloadSlides });
                 if(res.status === 'success') showToast('輪播變更已發佈'); 
@@ -998,7 +999,7 @@
         const publishToWeb = async () => {
             isPublishingWeb.value = true;
             try {
-                const payloadButtons = buttons.value.map(b => ({ ...b, url: buildFinalLink(b.type, b.linkValue) }));
+                const payloadButtons = buttons.value.map(b => ({ ...b, id: b.id || createUniqueId('btn'), url: buildFinalLink(b.type, b.linkValue) }));
                 await apiCall({ action: 'saveAll', memberId: currentUser.value.memberId, profile: profile.value, buttons: payloadButtons });
                 
                 const res = await apiCall({ action: 'publishToWeb', memberId: currentUser.value.memberId });
@@ -1197,7 +1198,7 @@
 
         const shareProfilePage = async () => {
             if (!currentUser.value) return;
-            // 直接組成專屬的 GitHub Pages 靜態網址
+            // 系統自動抓取 GitHub 網址
             const shareUrl = 'https://rubybranddesign-cloud.github.io/e-line-card-share/' + currentUser.value.memberId + '/';
             const shareText = '哈囉！這是「' + (profile.value.name || currentUser.value.name) + '」的電子名片，請點擊連結查看：\n' + shareUrl;
             
