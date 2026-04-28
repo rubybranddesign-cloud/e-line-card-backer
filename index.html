@@ -130,7 +130,7 @@
             <span class="hidden sm:inline">{{ isProfileLinkCopied ? '已複製！' : '分享個人頁' }}</span>
             <span class="sm:hidden">{{ isProfileLinkCopied ? '已複製' : '個人' }}</span>
           </button>
-          <button @click="logout" class="text-gray-400 font-bold hover:bg-gray-100 p-2 rounded-lg transition flex items-center gap-1 shrink-0"><i class="ph ph-sign-out text-xl"></i> <span class="hidden sm:inline">登出</span></button>
+          <button @click="logout" class="text-gray-400 font-bold hover:bg-gray-100 p-2 rounded-lg transition flex items-center gap-1 shrink-0"><i class="ph ph-sign-out text-xl"></i> <span class="hidden sm:inline">登入</span></button>
         </div>
       </div>
 
@@ -802,24 +802,28 @@
         const loadDashboardData = async () => {
             isFetchingData.value = true;
             try {
-                const pRes = await apiCall({ action: 'getProfile', memberId: currentUser.value.memberId });
-                if(pRes.status === 'success' && pRes.data.name) {
+                // 優化：使用 Promise.all 讓三個 API 請求並行處理，大幅減少等待時間
+                const [pRes, bRes, sRes] = await Promise.all([
+                    apiCall({ action: 'getProfile', memberId: currentUser.value.memberId }),
+                    apiCall({ action: 'getButtons', memberId: currentUser.value.memberId }),
+                    apiCall({ action: 'getSlides', memberId: currentUser.value.memberId })
+                ]);
+
+                // 修正：移除舊版嚴格判斷 pRes.data.name，避免新註冊會員因無名稱而無法載入資料的 Bug
+                if(pRes.status === 'success' && pRes.data) {
                     profile.value = { ...profile.value, ...pRes.data };
                 }
                 
-                const bRes = await apiCall({ action: 'getButtons', memberId: currentUser.value.memberId });
-                if(bRes.status === 'success') {
+                if(bRes.status === 'success' && bRes.data) {
                     buttons.value = bRes.data.map(b => {
                         const parsed = parseLink(b.url);
                         return { ...b, type: parsed.type, linkValue: parsed.value, textColor: b.textColor || '#000000' };
                     });
                 }
 
-                const sRes = await apiCall({ action: 'getSlides', memberId: currentUser.value.memberId });
-                if(sRes.status === 'success') {
+                if(sRes.status === 'success' && sRes.data) {
                     slides.value = sRes.data.map(s => ({
                         ...s,
-                        // 🚀 確保資料回來時，如果有少 ID，幫忙補上
                         id: s.id || createUniqueId('sld'),
                         buttons: s.buttons.map(b => {
                             const parsed = parseLink(b.url);
@@ -830,7 +834,7 @@
                 
                 nextTick(() => { autoResize('bio-textarea-edit'); }); 
             } catch (e) { 
-                showToast('載入失敗', 'error'); 
+                showToast('載入失敗，請檢查網路狀態', 'error'); 
             } finally { 
                 isFetchingData.value = false; 
             }
