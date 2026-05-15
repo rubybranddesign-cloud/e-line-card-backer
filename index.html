@@ -148,7 +148,6 @@
 
             <div class="flex flex-col lg:flex-row gap-8 justify-center items-start w-full min-w-0">
                 
-                <!-- 預覽區 -->
                 <div class="sticky mockup-phone no-scrollbar transition-all shrink-0" :class="{'hidden lg:flex': mobileViewModeProfile === 'edit'}" style="top: max(96px, calc(50vh - 350px));">
                     <div class="mockup-notch"></div>
                     
@@ -187,7 +186,6 @@
                                 <video v-if="getVideoData(profile.ytUrl).type === 'html5'" :src="getVideoData(profile.ytUrl).embedUrl" class="absolute inset-0 w-full h-full" controls playsinline controlslist="nodownload"></video>
                             </div>
 
-                            <!-- 按鈕與圖片混合顯示預覽區 -->
                             <div class="w-full mt-5 space-y-4 pb-6">
                                 <template v-for="(btn, index) in buttons" :key="btn.id">
                                     <a v-if="btn.btnType !== 'image'" :href="buildFinalLink(btn.type, btn.linkValue)" target="_blank"
@@ -200,9 +198,9 @@
                                     <div v-else class="w-full aspect-[4/5] relative rounded-[13px] overflow-hidden shadow-sm group transform transition hover:opacity-[0.98] select-none"
                                          @touchstart="handleTouchStart($event)"
                                          @touchend="handleTouchEnd($event, btn)">
-                                        <a :href="buildFinalLink(btn.type, btn.linkValue)" target="_blank" class="block w-full h-full relative cursor-pointer bg-gray-100">
+                                        <a :href="buildFinalLink(btn.images[btn.currentImgIdx || 0]?.linkType || btn.type || 'url', btn.images[btn.currentImgIdx || 0]?.linkValue || btn.linkValue || '')" target="_blank" class="block w-full h-full relative cursor-pointer bg-gray-100">
                                             <transition-group name="fade">
-                                                <img v-for="(img, i) in btn.images" :key="img + i" v-show="(btn.currentImgIdx || 0) === i" :src="img" class="absolute inset-0 w-full h-full object-cover">
+                                                <img v-for="(imgObj, i) in btn.images" :key="imgObj.url + i" v-show="(btn.currentImgIdx || 0) === i" :src="imgObj.url" class="absolute inset-0 w-full h-full object-cover">
                                             </transition-group>
                                             <div v-if="!btn.images || btn.images.length === 0" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
                                                 <i class="ph-fill ph-image text-3xl mb-1"></i>
@@ -210,7 +208,7 @@
                                             </div>
                                         </a>
                                         <div v-if="btn.images && btn.images.length > 1" class="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5 z-20 pointer-events-none">
-                                            <div v-for="(img, i) in btn.images" :key="'dot'+i" class="w-1.5 h-1.5 rounded-full transition-all duration-300 shadow-sm" :class="(btn.currentImgIdx || 0) === i ? 'bg-white scale-110' : 'bg-white/50'"></div>
+                                            <div v-for="(imgObj, i) in btn.images" :key="'dot'+i" class="w-1.5 h-1.5 rounded-full transition-all duration-300 shadow-sm" :class="(btn.currentImgIdx || 0) === i ? 'bg-white scale-110' : 'bg-white/50'"></div>
                                         </div>
                                         <button v-if="btn.images && btn.images.length > 1" @click.stop.prevent="prevImg(btn)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/20 text-white rounded-full p-1.5 z-20 hover:bg-black/50 transition opacity-0 lg:group-hover:opacity-100"><i class="ph-bold ph-caret-left"></i></button>
                                         <button v-if="btn.images && btn.images.length > 1" @click.stop.prevent="nextImg(btn)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/20 text-white rounded-full p-1.5 z-20 hover:bg-black/50 transition opacity-0 lg:group-hover:opacity-100"><i class="ph-bold ph-caret-right"></i></button>
@@ -245,7 +243,6 @@
                     </div>
                 </div>
 
-                <!-- 編輯區 -->
                 <div class="w-full max-w-full lg:w-[500px] min-w-0" :class="{'hidden lg:block': mobileViewModeProfile === 'preview'}">
                     
                     <div class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 mb-5 w-full min-w-0">
@@ -365,7 +362,6 @@
                                     </div>
                                 </div>
 
-                                <!-- 按鈕顯示模式選擇 -->
                                 <div class="flex items-center gap-4 mt-2 mb-1">
                                     <label class="text-[11px] font-bold text-gray-500 flex items-center gap-1 cursor-pointer">
                                         <input type="radio" v-model="btn.btnType" value="button" class="accent-pink-500"> 一般文字按鈕
@@ -375,7 +371,7 @@
                                     </label>
                                 </div>
 
-                                <div class="flex gap-2 min-w-0 mt-1">
+                                <div v-show="btn.btnType === 'button'" class="flex gap-2 min-w-0 mt-1">
                                     <div class="relative w-[90px] sm:w-[110px] shrink-0">
                                         <select v-model="btn.type" @change="handleTypeChange(btn)" class="w-full appearance-none bg-white border border-gray-200 text-gray-600 font-bold px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-pink-400 text-xs cursor-pointer shadow-inner">
                                             <option v-for="type in buttonTypes" :key="type.val" :value="type.val">{{ type.label }}</option>
@@ -384,27 +380,45 @@
                                     </div>
                                     <input v-model="btn.title" class="flex-1 min-w-0 text-sm font-bold px-3 py-2 rounded-lg border border-gray-200 outline-none focus:ring-2 focus:ring-pink-400 bg-white shadow-inner" placeholder="按鈕顯示名稱">
                                 </div>
-                                <input v-model="btn.linkValue" class="w-full min-w-0 text-xs px-3 py-2 rounded-lg border border-gray-200 outline-none focus:ring-2 focus:ring-pink-400 bg-white shadow-inner" :placeholder="getPlaceholder(btn.type)">
+                                <input v-show="btn.btnType === 'button'" v-model="btn.linkValue" class="w-full min-w-0 text-xs px-3 py-2 rounded-lg border border-gray-200 outline-none focus:ring-2 focus:ring-pink-400 bg-white shadow-inner" :placeholder="getPlaceholder(btn.type)">
                                 
-                                <!-- 圖片輪播專屬 UI -->
+                                <div v-show="btn.btnType === 'image'" class="flex gap-2 min-w-0 mt-1">
+                                    <input v-model="btn.title" class="flex-1 min-w-0 text-sm font-bold px-3 py-2 rounded-lg border border-gray-200 outline-none focus:ring-2 focus:ring-pink-400 bg-white shadow-inner" placeholder="圖片群組顯示名稱 (供後台辨識用)">
+                                </div>
+
                                 <div v-if="btn.btnType === 'image'" class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm mt-1">
-                                    <p class="text-[10px] text-pink-500 font-bold mb-3 flex items-start gap-1 leading-tight"><i class="ph-fill ph-warning-circle text-xs mt-0.5"></i> 建議上傳 4:5 比例的圖片檔（類似 IG 貼文），以確保手機版觀看的最佳體驗！支援多張滑動輪播。</p>
+                                    <p class="text-[10px] text-pink-500 font-bold mb-3 flex items-start gap-1 leading-tight"><i class="ph-fill ph-warning-circle text-xs mt-0.5"></i> 建議上傳 4:5 比例的圖片檔（類似 IG 貼文）。支援多張滑動輪播，點擊下方圖片縮圖即可為每一張圖獨立設定專屬連結！</p>
                                     <div class="flex gap-2 overflow-x-auto no-scrollbar items-center pb-2">
-                                        <div v-for="(img, imgIdx) in btn.images" :key="'img'+imgIdx" class="w-[70px] h-[87px] relative rounded-lg overflow-hidden shrink-0 border border-gray-200 group">
-                                            <img :src="img" class="w-full h-full object-cover">
-                                            <button @click="btn.images.splice(imgIdx, 1)" class="absolute top-1 right-1 bg-white/90 text-red-500 rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow-sm"><i class="ph-bold ph-x text-[10px]"></i></button>
+                                        <div v-for="(imgObj, imgIdx) in btn.images" :key="'img'+imgIdx" @click="btn.currentImgIdx = imgIdx" class="w-[70px] h-[87px] relative rounded-lg overflow-hidden shrink-0 border-2 cursor-pointer transition-all group" :class="btn.currentImgIdx === imgIdx ? 'border-pink-500 shadow-md scale-[1.02]' : 'border-gray-200 hover:border-pink-300'">
+                                            <img :src="imgObj.url" class="w-full h-full object-cover">
+                                            <button @click.stop="btn.images.splice(imgIdx, 1); if(btn.currentImgIdx >= btn.images.length) btn.currentImgIdx = Math.max(0, btn.images.length - 1);" class="absolute top-1 right-1 bg-white/90 text-red-500 rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow-sm"><i class="ph-bold ph-x text-[10px]"></i></button>
+                                            <div v-if="imgObj.linkValue" class="absolute bottom-1 right-1 bg-green-500 text-white rounded-full w-4 h-4 flex items-center justify-center shadow-sm"><i class="ph-bold ph-link text-[8px]"></i></div>
                                         </div>
                                         <button @click.stop="openMediaLibrary('btnImage', index)" class="w-[70px] h-[87px] border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:text-pink-500 hover:border-pink-500 transition shrink-0 bg-gray-50">
                                             <i class="ph-bold ph-plus text-lg"></i>
                                             <span class="text-[10px] font-bold mt-1">加圖片</span>
                                         </button>
                                     </div>
+                                    
+                                    <div v-if="btn.images && btn.images.length > 0" class="mt-2 pt-3 border-t border-gray-100">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <label class="text-[11px] font-bold text-gray-700 bg-gray-100 px-2 py-1 rounded">第 {{ (btn.currentImgIdx || 0) + 1 }} 張圖片專屬連結</label>
+                                        </div>
+                                        <div class="flex gap-2 min-w-0">
+                                            <div class="relative w-[90px] sm:w-[110px] shrink-0">
+                                                <select v-model="btn.images[btn.currentImgIdx || 0].linkType" @change="handleTypeChange(btn.images[btn.currentImgIdx || 0])" class="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-600 font-bold px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-pink-400 text-xs cursor-pointer shadow-inner">
+                                                    <option v-for="type in buttonTypes" :key="type.val" :value="type.val">{{ type.label }}</option>
+                                                </select>
+                                                <i class="ph-bold ph-caret-down absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i>
+                                            </div>
+                                            <input v-model="btn.images[btn.currentImgIdx || 0].linkValue" class="flex-1 min-w-0 text-xs px-3 py-2 rounded-lg border border-gray-200 outline-none focus:ring-2 focus:ring-pink-400 bg-gray-50 shadow-inner" :placeholder="getPlaceholder(btn.images[btn.currentImgIdx || 0].linkType)">
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="pt-2 border-t border-gray-200 mt-2 flex justify-between items-center">
                                     <span class="text-[10px] font-bold text-gray-500 flex items-center gap-1 shrink-0"><i class="ph-fill ph-cursor-click"></i> {{ btn.clicks || 0 }} 點擊</span>
                                     
-                                    <!-- 僅在一般文字按鈕顯示顏色設定 -->
                                     <div v-if="btn.btnType !== 'image'" class="flex gap-2 shrink-0">
                                         <div class="relative">
                                             <button @click.stop="togglePalette('btnText_' + btn.id)" class="text-[10px] font-bold bg-white border px-2 py-1.5 rounded-lg flex items-center gap-1 hover:bg-gray-100 transition" title="按鈕文字色">
@@ -811,7 +825,7 @@
         };
 
         const handleTypeChange = (item) => {
-            if (item.type === 'share') {
+            if (item.type === 'share' || item.linkType === 'share') {
                 const liffId = "2009561347-VUhbtrEC"; 
                 item.linkValue = 'https://liff.line.me/' + liffId + '?id=' + currentUser.value.memberId + '&autoShare=true';
             }
@@ -867,13 +881,24 @@
                 if(bRes.status === 'success' && bRes.data) {
                     buttons.value = bRes.data.map(b => {
                         const parsed = parseLink(b.url);
+                        
+                        // 處理來自後端 JSON 字串化的圖片設定 (完美對接各自獨立的 URL 與連結)
+                        let parsedImages = [];
+                        if (b['圖片詳細設定'] || b.imageDetails) {
+                            try { parsedImages = JSON.parse(b['圖片詳細設定'] || b.imageDetails); } catch(e) {}
+                        }
+                        // 兼容舊資料，若是舊的純網址字串，幫忙轉換成新的 Object 格式
+                        if (parsedImages.length === 0 && (b['圖片清單'] || b.imageUrls)) {
+                            parsedImages = (b['圖片清單'] || b.imageUrls).split(',').map(u => ({ url: u.trim(), linkType: 'url', linkValue: '' })).filter(img => img.url !== '');
+                        }
+
                         return { 
                             ...b, 
                             type: parsed.type, 
                             linkValue: parsed.value, 
                             textColor: b.textColor || '#000000',
                             btnType: b.btnType || b['按鈕類型'] || 'button',
-                            images: b.imageUrls ? String(b.imageUrls).split(',').map(u=>u.trim()).filter(Boolean) : [],
+                            images: parsedImages,
                             currentImgIdx: 0
                         };
                     });
@@ -1039,7 +1064,8 @@
                     ...b, 
                     id: b.id || createUniqueId('btn'), 
                     url: buildFinalLink(b.type, b.linkValue),
-                    imageUrls: Array.isArray(b.images) ? b.images.join(',') : ''
+                    imageUrls: Array.isArray(b.images) ? b.images.map(img => img.url).join(',') : '', // 兼容舊版備用儲存
+                    images: b.images // 包含各自獨立連結的新 JSON 格式會由後端直接解析
                 }));
                 const res = await apiCall({ action: 'saveAll', memberId: currentUser.value.memberId, profile: profile.value, buttons: payloadButtons });
                 if(res.status === 'success') showToast('Profile 已同步更新'); 
@@ -1069,7 +1095,8 @@
                     ...b, 
                     id: b.id || createUniqueId('btn'), 
                     url: buildFinalLink(b.type, b.linkValue),
-                    imageUrls: Array.isArray(b.images) ? b.images.join(',') : ''
+                    imageUrls: Array.isArray(b.images) ? b.images.map(img => img.url).join(',') : '',
+                    images: b.images
                 }));
                 await apiCall({ action: 'saveAll', memberId: currentUser.value.memberId, profile: profile.value, buttons: payloadButtons });
                 
@@ -1213,7 +1240,9 @@
             else if (currentUploadContext.value === 'avatar') profile.value.avatarUrl = fullBase64;
             else if (currentUploadContext.value === 'btnImage') {
                 if (!buttons.value[currentButtonIndex.value].images) buttons.value[currentButtonIndex.value].images = [];
-                buttons.value[currentButtonIndex.value].images.push(fullBase64);
+                // 每次新增圖片，預設先給個空白的連結設定並自動對焦到該圖片
+                buttons.value[currentButtonIndex.value].images.push({ url: fullBase64, linkType: 'url', linkValue: '' });
+                buttons.value[currentButtonIndex.value].currentImgIdx = buttons.value[currentButtonIndex.value].images.length - 1;
             }
             
             showToast('圖片已即時套用！上傳雲端中...');
@@ -1256,15 +1285,15 @@
                     swapCacheUrl(slideImagesCache.value);
                     swapCacheUrl(mediaImages.value);
                     
-                    if (context === 'avatar' && profile.value.avatarUrl === fullBase64) profile.value.avatarUrl = realUrl;
-                    else if (context === 'bgImage' && profile.value.bgImageUrl === fullBase64) profile.value.bgImageUrl = realUrl;
+                    if (context === 'avatar' && profile.value.avatarUrl.length > 1000) profile.value.avatarUrl = realUrl;
+                    else if (context === 'bgImage' && profile.value.bgImageUrl.length > 1000) profile.value.bgImageUrl = realUrl;
                     else if (context === 'slide' && index !== null && slides.value[index].imageUrl.includes('data:image')) slides.value[index].imageUrl = realUrl;
                     else if (context === 'btnImage' && index !== null && buttons.value[index]) {
-                        // 更換剛才塞入的 Base64 成為正式網址
+                        // 更換剛才塞入的 Base64 成為正式雲端網址
                         let imgs = buttons.value[index].images;
                         for(let i = 0; i < imgs.length; i++) {
-                            if(imgs[i].length > 1000) { 
-                                buttons.value[index].images[i] = realUrl;
+                            if(imgs[i].url.length > 1000) { 
+                                buttons.value[index].images[i].url = realUrl;
                             }
                         }
                     }
@@ -1280,7 +1309,8 @@
             else if (currentUploadContext.value === 'slide') slides.value[currentButtonIndex.value].imageUrl = url;
             else if (currentUploadContext.value === 'btnImage') {
                 if (!buttons.value[currentButtonIndex.value].images) buttons.value[currentButtonIndex.value].images = [];
-                buttons.value[currentButtonIndex.value].images.push(url);
+                buttons.value[currentButtonIndex.value].images.push({ url: url, linkType: 'url', linkValue: '' });
+                buttons.value[currentButtonIndex.value].currentImgIdx = buttons.value[currentButtonIndex.value].images.length - 1;
             }
             isMediaModalOpen.value = false; 
         };
