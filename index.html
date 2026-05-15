@@ -727,9 +727,16 @@
                     body: JSON.stringify(payload)
                 });
                 const data = await response.json();
+                if (data.status === 'expired') {
+                    showToast(data.message || '此帳號已失效，系統即將登出', 'error');
+                    setTimeout(() => { logout(); }, 2000);
+                    throw new Error('帳號已失效');
+                }
                 return data;
             } catch (err) {
-                showToast('伺服器連線異常，請稍後再試', 'error');
+                if (err.message !== '帳號已失效') {
+                   showToast('伺服器連線異常，請稍後再試', 'error');
+                }
                 throw err;
             }
         };
@@ -882,12 +889,10 @@
                     buttons.value = bRes.data.map(b => {
                         const parsed = parseLink(b.url);
                         
-                        // 處理來自後端 JSON 字串化的圖片設定 (完美對接各自獨立的 URL 與連結)
                         let parsedImages = [];
                         if (b['圖片詳細設定'] || b.imageDetails) {
                             try { parsedImages = JSON.parse(b['圖片詳細設定'] || b.imageDetails); } catch(e) {}
                         }
-                        // 兼容舊資料，若是舊的純網址字串，幫忙轉換成新的 Object 格式
                         if (parsedImages.length === 0 && (b['圖片清單'] || b.imageUrls)) {
                             parsedImages = (b['圖片清單'] || b.imageUrls).split(',').map(u => ({ url: u.trim(), linkType: 'url', linkValue: '' })).filter(img => img.url !== '');
                         }
@@ -932,9 +937,6 @@
             }
         });
 
-        // ==========================
-        // 原生手機輪播圖片滑動事件 (Touch)
-        // ==========================
         const handleTouchStart = (e) => { touchStartX.value = e.changedTouches[0].screenX; };
         const handleTouchEnd = (e, btn) => {
             if (!btn.images || btn.images.length <= 1) return;
@@ -1064,8 +1066,8 @@
                     ...b, 
                     id: b.id || createUniqueId('btn'), 
                     url: buildFinalLink(b.type, b.linkValue),
-                    imageUrls: Array.isArray(b.images) ? b.images.map(img => img.url).join(',') : '', // 兼容舊版備用儲存
-                    images: b.images // 包含各自獨立連結的新 JSON 格式會由後端直接解析
+                    imageUrls: Array.isArray(b.images) ? b.images.map(img => img.url).join(',') : '', 
+                    images: b.images 
                 }));
                 const res = await apiCall({ action: 'saveAll', memberId: currentUser.value.memberId, profile: profile.value, buttons: payloadButtons });
                 if(res.status === 'success') showToast('Profile 已同步更新'); 
@@ -1139,7 +1141,7 @@
                 return;
             }
             try {
-                const res = await apiCall({ action: 'deleteGalleryImage', fileId: fileId });
+                const res = await apiCall({ action: 'deleteGalleryImage', fileId: fileId, memberId: currentUser.value.memberId });
                 if (res.status === 'success') showToast('已從雲端圖庫中徹底刪除');
                 else throw new Error();
             } catch(e) {
@@ -1168,7 +1170,7 @@
             isLoadingImages.value = true; 
             isMediaModalOpen.value = true;
             try {
-                const res = await apiCall({ action: 'getImages', folderId: targetFolderId });
+                const res = await apiCall({ action: 'getImages', folderId: targetFolderId, memberId: currentUser.value.memberId });
                 if(res.status === 'success') {
                     if (isProfileContext) { 
                         profileImagesCache.value = res.data; 
@@ -1240,7 +1242,6 @@
             else if (currentUploadContext.value === 'avatar') profile.value.avatarUrl = fullBase64;
             else if (currentUploadContext.value === 'btnImage') {
                 if (!buttons.value[currentButtonIndex.value].images) buttons.value[currentButtonIndex.value].images = [];
-                // 每次新增圖片，預設先給個空白的連結設定並自動對焦到該圖片
                 buttons.value[currentButtonIndex.value].images.push({ url: fullBase64, linkType: 'url', linkValue: '' });
                 buttons.value[currentButtonIndex.value].currentImgIdx = buttons.value[currentButtonIndex.value].images.length - 1;
             }
@@ -1289,7 +1290,6 @@
                     else if (context === 'bgImage' && profile.value.bgImageUrl.length > 1000) profile.value.bgImageUrl = realUrl;
                     else if (context === 'slide' && index !== null && slides.value[index].imageUrl.includes('data:image')) slides.value[index].imageUrl = realUrl;
                     else if (context === 'btnImage' && index !== null && buttons.value[index]) {
-                        // 更換剛才塞入的 Base64 成為正式雲端網址
                         let imgs = buttons.value[index].images;
                         for(let i = 0; i < imgs.length; i++) {
                             if(imgs[i].url.length > 1000) { 
