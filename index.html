@@ -41,7 +41,7 @@
     .toast-enter-active, .toast-leave-active { transition: all 0.5s ease; }
     .toast-enter-from, .toast-leave-to { opacity: 0; transform: translate(-50%, -20px); }
     .toast-enter-to, .toast-leave-from { opacity: 1; transform: translate(-50%, 0); }
-    .fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
+    .fade-enter-active, .fade-leave-active { transition: opacity 0.4s ease; }
     .fade-enter-from, .fade-leave-to { opacity: 0; }
     .slide-down-enter-active, .slide-down-leave-active { transition: all 0.3s ease; }
     .slide-down-enter-from, .slide-down-leave-to { opacity: 0; transform: translateY(-10px); }
@@ -130,7 +130,7 @@
             <span class="hidden sm:inline">{{ isProfileLinkCopied ? '已複製！' : '分享個人頁' }}</span>
             <span class="sm:hidden">{{ isProfileLinkCopied ? '已複製' : '個人' }}</span>
           </button>
-          <button @click="logout" class="text-gray-400 font-bold hover:bg-gray-100 p-2 rounded-lg transition flex items-center gap-1 shrink-0"><i class="ph ph-sign-out text-xl"></i> <span class="hidden sm:inline">登入</span></button>
+          <button @click="logout" class="text-gray-400 font-bold hover:bg-gray-100 p-2 rounded-lg transition flex items-center gap-1 shrink-0"><i class="ph ph-sign-out text-xl"></i> <span class="hidden sm:inline">登出</span></button>
         </div>
       </div>
 
@@ -148,6 +148,7 @@
 
             <div class="flex flex-col lg:flex-row gap-8 justify-center items-start w-full min-w-0">
                 
+                <!-- 預覽區 -->
                 <div class="sticky mockup-phone no-scrollbar transition-all shrink-0" :class="{'hidden lg:flex': mobileViewModeProfile === 'edit'}" style="top: max(96px, calc(50vh - 350px));">
                     <div class="mockup-notch"></div>
                     
@@ -186,14 +187,35 @@
                                 <video v-if="getVideoData(profile.ytUrl).type === 'html5'" :src="getVideoData(profile.ytUrl).embedUrl" class="absolute inset-0 w-full h-full" controls playsinline controlslist="nodownload"></video>
                             </div>
 
-                            <div class="w-full mt-5 space-y-3 pb-6">
-                                <a v-for="btn in buttons" :key="btn.id" 
-                                   :href="buildFinalLink(btn.type, btn.linkValue)" target="_blank"
-                                   class="w-full flex items-center justify-center font-bold px-4 py-[14px] transition cursor-pointer relative overflow-hidden group shadow-sm rounded-[2px]" 
-                                   :style="{ backgroundColor: btn.color || '#d4af37', color: btn.textColor || '#000000' }">
-                                   <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                   <span class="tracking-widest text-[13px]">{{ btn.title || '按鈕文字' }}</span>
-                                </a>
+                            <!-- 按鈕與圖片混合顯示預覽區 -->
+                            <div class="w-full mt-5 space-y-4 pb-6">
+                                <template v-for="(btn, index) in buttons" :key="btn.id">
+                                    <a v-if="btn.btnType !== 'image'" :href="buildFinalLink(btn.type, btn.linkValue)" target="_blank"
+                                       class="w-full flex items-center justify-center font-bold px-4 py-[16px] transition cursor-pointer relative overflow-hidden group shadow-sm rounded-[13px]" 
+                                       :style="{ backgroundColor: btn.color || '#d4af37', color: btn.textColor || '#000000', textDecoration: 'none' }">
+                                       <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                       <span class="tracking-widest text-[15px]">{{ btn.title || '按鈕文字' }}</span>
+                                    </a>
+
+                                    <div v-else class="w-full aspect-[4/5] relative rounded-[13px] overflow-hidden shadow-sm group transform transition hover:opacity-[0.98] select-none"
+                                         @touchstart="handleTouchStart($event)"
+                                         @touchend="handleTouchEnd($event, btn)">
+                                        <a :href="buildFinalLink(btn.type, btn.linkValue)" target="_blank" class="block w-full h-full relative cursor-pointer bg-gray-100">
+                                            <transition-group name="fade">
+                                                <img v-for="(img, i) in btn.images" :key="img + i" v-show="(btn.currentImgIdx || 0) === i" :src="img" class="absolute inset-0 w-full h-full object-cover">
+                                            </transition-group>
+                                            <div v-if="!btn.images || btn.images.length === 0" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
+                                                <i class="ph-fill ph-image text-3xl mb-1"></i>
+                                                <span class="text-[10px] font-bold">請於編輯區上傳圖片</span>
+                                            </div>
+                                        </a>
+                                        <div v-if="btn.images && btn.images.length > 1" class="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5 z-20 pointer-events-none">
+                                            <div v-for="(img, i) in btn.images" :key="'dot'+i" class="w-1.5 h-1.5 rounded-full transition-all duration-300 shadow-sm" :class="(btn.currentImgIdx || 0) === i ? 'bg-white scale-110' : 'bg-white/50'"></div>
+                                        </div>
+                                        <button v-if="btn.images && btn.images.length > 1" @click.stop.prevent="prevImg(btn)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/20 text-white rounded-full p-1.5 z-20 hover:bg-black/50 transition opacity-0 lg:group-hover:opacity-100"><i class="ph-bold ph-caret-left"></i></button>
+                                        <button v-if="btn.images && btn.images.length > 1" @click.stop.prevent="nextImg(btn)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/20 text-white rounded-full p-1.5 z-20 hover:bg-black/50 transition opacity-0 lg:group-hover:opacity-100"><i class="ph-bold ph-caret-right"></i></button>
+                                    </div>
+                                </template>
                             </div>
                             
                             <div v-if="slides && slides.length > 0" class="w-full mt-2 pb-10">
@@ -223,6 +245,7 @@
                     </div>
                 </div>
 
+                <!-- 編輯區 -->
                 <div class="w-full max-w-full lg:w-[500px] min-w-0" :class="{'hidden lg:block': mobileViewModeProfile === 'preview'}">
                     
                     <div class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 mb-5 w-full min-w-0">
@@ -331,7 +354,7 @@
                         </div>
                         
                         <div class="space-y-4">
-                            <div v-for="(btn, index) in buttons" :key="btn.id" class="p-4 bg-gray-50 border border-gray-200 rounded-2xl flex flex-col gap-3 shadow-sm min-w-0 relative">
+                            <div v-for="(btn, index) in buttons" :key="btn.id" class="p-4 bg-gray-50 border border-gray-200 rounded-2xl flex flex-col gap-2 shadow-sm min-w-0 relative">
                                 <div class="flex justify-between items-center border-b border-gray-200 pb-2">
                                     <div class="text-xs font-bold text-gray-500 truncate mr-2">按鈕項目 {{ index + 1 }}</div>
                                     <div class="flex gap-1.5 shrink-0">
@@ -342,7 +365,17 @@
                                     </div>
                                 </div>
 
-                                <div class="flex gap-2 min-w-0">
+                                <!-- 按鈕顯示模式選擇 -->
+                                <div class="flex items-center gap-4 mt-2 mb-1">
+                                    <label class="text-[11px] font-bold text-gray-500 flex items-center gap-1 cursor-pointer">
+                                        <input type="radio" v-model="btn.btnType" value="button" class="accent-pink-500"> 一般文字按鈕
+                                    </label>
+                                    <label class="text-[11px] font-bold text-gray-500 flex items-center gap-1 cursor-pointer">
+                                        <input type="radio" v-model="btn.btnType" value="image" class="accent-pink-500"> 圖片輪播(4:5)
+                                    </label>
+                                </div>
+
+                                <div class="flex gap-2 min-w-0 mt-1">
                                     <div class="relative w-[90px] sm:w-[110px] shrink-0">
                                         <select v-model="btn.type" @change="handleTypeChange(btn)" class="w-full appearance-none bg-white border border-gray-200 text-gray-600 font-bold px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-pink-400 text-xs cursor-pointer shadow-inner">
                                             <option v-for="type in buttonTypes" :key="type.val" :value="type.val">{{ type.label }}</option>
@@ -353,9 +386,26 @@
                                 </div>
                                 <input v-model="btn.linkValue" class="w-full min-w-0 text-xs px-3 py-2 rounded-lg border border-gray-200 outline-none focus:ring-2 focus:ring-pink-400 bg-white shadow-inner" :placeholder="getPlaceholder(btn.type)">
                                 
-                                <div class="pt-2 border-t border-gray-200 mt-1 flex justify-between items-center">
+                                <!-- 圖片輪播專屬 UI -->
+                                <div v-if="btn.btnType === 'image'" class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm mt-1">
+                                    <p class="text-[10px] text-pink-500 font-bold mb-3 flex items-start gap-1 leading-tight"><i class="ph-fill ph-warning-circle text-xs mt-0.5"></i> 建議上傳 4:5 比例的圖片檔（類似 IG 貼文），以確保手機版觀看的最佳體驗！支援多張滑動輪播。</p>
+                                    <div class="flex gap-2 overflow-x-auto no-scrollbar items-center pb-2">
+                                        <div v-for="(img, imgIdx) in btn.images" :key="'img'+imgIdx" class="w-[70px] h-[87px] relative rounded-lg overflow-hidden shrink-0 border border-gray-200 group">
+                                            <img :src="img" class="w-full h-full object-cover">
+                                            <button @click="btn.images.splice(imgIdx, 1)" class="absolute top-1 right-1 bg-white/90 text-red-500 rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow-sm"><i class="ph-bold ph-x text-[10px]"></i></button>
+                                        </div>
+                                        <button @click.stop="openMediaLibrary('btnImage', index)" class="w-[70px] h-[87px] border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:text-pink-500 hover:border-pink-500 transition shrink-0 bg-gray-50">
+                                            <i class="ph-bold ph-plus text-lg"></i>
+                                            <span class="text-[10px] font-bold mt-1">加圖片</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="pt-2 border-t border-gray-200 mt-2 flex justify-between items-center">
                                     <span class="text-[10px] font-bold text-gray-500 flex items-center gap-1 shrink-0"><i class="ph-fill ph-cursor-click"></i> {{ btn.clicks || 0 }} 點擊</span>
-                                    <div class="flex gap-2 shrink-0">
+                                    
+                                    <!-- 僅在一般文字按鈕顯示顏色設定 -->
+                                    <div v-if="btn.btnType !== 'image'" class="flex gap-2 shrink-0">
                                         <div class="relative">
                                             <button @click.stop="togglePalette('btnText_' + btn.id)" class="text-[10px] font-bold bg-white border px-2 py-1.5 rounded-lg flex items-center gap-1 hover:bg-gray-100 transition" title="按鈕文字色">
                                                 <span class="w-3 h-3 border border-gray-300 rounded-sm" :style="{backgroundColor: btn.textColor || '#000000'}"></span> 字色
@@ -789,6 +839,8 @@
         const isUploading = ref(false);
         let cropperInstance = null;
 
+        const touchStartX = ref(0);
+
         const createUniqueId = (prefix) => prefix + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 8);
 
         const autoResize = (id) => { 
@@ -802,14 +854,12 @@
         const loadDashboardData = async () => {
             isFetchingData.value = true;
             try {
-                // 優化：使用 Promise.all 讓三個 API 請求並行處理，大幅減少等待時間
                 const [pRes, bRes, sRes] = await Promise.all([
                     apiCall({ action: 'getProfile', memberId: currentUser.value.memberId }),
                     apiCall({ action: 'getButtons', memberId: currentUser.value.memberId }),
                     apiCall({ action: 'getSlides', memberId: currentUser.value.memberId })
                 ]);
 
-                // 修正：移除舊版嚴格判斷 pRes.data.name，避免新註冊會員因無名稱而無法載入資料的 Bug
                 if(pRes.status === 'success' && pRes.data) {
                     profile.value = { ...profile.value, ...pRes.data };
                 }
@@ -817,7 +867,15 @@
                 if(bRes.status === 'success' && bRes.data) {
                     buttons.value = bRes.data.map(b => {
                         const parsed = parseLink(b.url);
-                        return { ...b, type: parsed.type, linkValue: parsed.value, textColor: b.textColor || '#000000' };
+                        return { 
+                            ...b, 
+                            type: parsed.type, 
+                            linkValue: parsed.value, 
+                            textColor: b.textColor || '#000000',
+                            btnType: b.btnType || b['按鈕類型'] || 'button',
+                            images: b.imageUrls ? String(b.imageUrls).split(',').map(u=>u.trim()).filter(Boolean) : [],
+                            currentImgIdx: 0
+                        };
                     });
                 }
 
@@ -848,6 +906,23 @@
                 loadDashboardData(); 
             }
         });
+
+        // ==========================
+        // 原生手機輪播圖片滑動事件 (Touch)
+        // ==========================
+        const handleTouchStart = (e) => { touchStartX.value = e.changedTouches[0].screenX; };
+        const handleTouchEnd = (e, btn) => {
+            if (!btn.images || btn.images.length <= 1) return;
+            const diff = touchStartX.value - e.changedTouches[0].screenX;
+            if (diff > 40) nextImg(btn);
+            else if (diff < -40) prevImg(btn);
+        };
+        const nextImg = (btn) => {
+            if (btn.images && btn.images.length > 1) btn.currentImgIdx = ((btn.currentImgIdx || 0) + 1) % btn.images.length;
+        };
+        const prevImg = (btn) => {
+            if (btn.images && btn.images.length > 1) btn.currentImgIdx = ((btn.currentImgIdx || 0) - 1 + btn.images.length) % btn.images.length;
+        };
 
         const handleLogin = async () => {
             isLoading.value = true;
@@ -911,34 +986,16 @@
         
         const togglePalette = (id) => { activePaletteId.value = activePaletteId.value === id ? null : id; };
         
-        const addNewButton = () => { 
-            buttons.value.push({ id: createUniqueId('btn'), type: 'url', title: '', linkValue: '', color: '#d4af37', textColor: '#000000', iconUrl: '', clicks: 0 }); 
-            nextTick(()=>{ window.scrollTo(0, document.body.scrollHeight); }); 
-        };
-
         const insertNewButton = (index) => {
             buttons.value.splice(index + 1, 0, {
-                id: createUniqueId('btn'), type: 'url', title: '', linkValue: '', color: '#d4af37', textColor: '#000000', iconUrl: '', clicks: 0
+                id: createUniqueId('btn'), type: 'url', title: '', linkValue: '', color: '#d4af37', textColor: '#000000', iconUrl: '', clicks: 0, btnType: 'button', images: [], currentImgIdx: 0
             });
         };
         
-        const addNewSlide = () => { 
-            slides.value.push({ id: createUniqueId('sld'), sort: slides.value.length + 1, imageUrl: '', buttonFont: '預設字體', buttonTextColor: '#ffffff', bgColor: '#ffffff', buttons: [] }); 
-            nextTick(() => { window.scrollTo(0, document.body.scrollHeight); }); 
-        };
-
         const insertNewSlide = (index) => {
             slides.value.splice(index + 1, 0, {
                 id: createUniqueId('sld'), sort: slides.value.length + 2, imageUrl: '', buttonFont: '預設字體', buttonTextColor: '#ffffff', bgColor: '#ffffff', buttons: []
             });
-        };
-
-        const duplicateSlide = (index) => {
-            const original = slides.value[index];
-            const cloned = JSON.parse(JSON.stringify(original)); 
-            cloned.id = createUniqueId('sld'); 
-            slides.value.splice(index + 1, 0, cloned);
-            showToast('已成功複製卡片');
         };
 
         const saveLineToken = async () => {
@@ -978,7 +1035,12 @@
             isSaving.value = true; 
             activePaletteId.value = null;
             try {
-                const payloadButtons = buttons.value.map(b => ({ ...b, id: b.id || createUniqueId('btn'), url: buildFinalLink(b.type, b.linkValue) }));
+                const payloadButtons = buttons.value.map(b => ({ 
+                    ...b, 
+                    id: b.id || createUniqueId('btn'), 
+                    url: buildFinalLink(b.type, b.linkValue),
+                    imageUrls: Array.isArray(b.images) ? b.images.join(',') : ''
+                }));
                 const res = await apiCall({ action: 'saveAll', memberId: currentUser.value.memberId, profile: profile.value, buttons: payloadButtons });
                 if(res.status === 'success') showToast('Profile 已同步更新'); 
                 else showToast('儲存失敗', 'error');
@@ -991,7 +1053,7 @@
             try {
                 const payloadSlides = slides.value.map(s => ({
                     ...s, 
-                    id: s.id || createUniqueId('sld'), // 防呆：確保一定要送 ID 出去
+                    id: s.id || createUniqueId('sld'),
                     buttons: s.buttons.map(b => ({ text: b.title, color: b.color, type: b.type, clicks: b.clicks, url: buildFinalLink(b.type, b.linkValue) }))
                 }));
                 const res = await apiCall({ action: 'saveSlides', memberId: currentUser.value.memberId, slides: payloadSlides });
@@ -1003,7 +1065,12 @@
         const publishToWeb = async () => {
             isPublishingWeb.value = true;
             try {
-                const payloadButtons = buttons.value.map(b => ({ ...b, id: b.id || createUniqueId('btn'), url: buildFinalLink(b.type, b.linkValue) }));
+                const payloadButtons = buttons.value.map(b => ({ 
+                    ...b, 
+                    id: b.id || createUniqueId('btn'), 
+                    url: buildFinalLink(b.type, b.linkValue),
+                    imageUrls: Array.isArray(b.images) ? b.images.join(',') : ''
+                }));
                 await apiCall({ action: 'saveAll', memberId: currentUser.value.memberId, profile: profile.value, buttons: payloadButtons });
                 
                 const res = await apiCall({ action: 'publishToWeb', memberId: currentUser.value.memberId });
@@ -1057,7 +1124,7 @@
         const openMediaLibrary = async (context, index = null) => {
             currentUploadContext.value = context; 
             currentButtonIndex.value = index; 
-            const isProfileContext = context === 'avatar' || context === 'bgImage';
+            const isProfileContext = context === 'avatar' || context === 'bgImage' || context === 'btnImage';
             const targetFolderId = isProfileContext ? currentUser.value.profileFolderId : currentUser.value.slideFolderId;
             
             if (isProfileContext && hasLoadedProfileImages.value) { 
@@ -1095,11 +1162,13 @@
             const files = e.target.files;
             if (!files || files.length === 0) return;
             
-            if (currentUploadContext.value === 'avatar' || currentUploadContext.value === 'bgImage') {
+            if (currentUploadContext.value === 'avatar' || currentUploadContext.value === 'bgImage' || currentUploadContext.value === 'btnImage') {
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     isMediaModalOpen.value = false;
-                    openCropper(event.target.result, currentUploadContext.value === 'bgImage' ? 4/5 : 1);
+                    let ratio = 1;
+                    if (currentUploadContext.value === 'bgImage' || currentUploadContext.value === 'btnImage') ratio = 4/5;
+                    openCropper(event.target.result, ratio);
                 };
                 reader.readAsDataURL(files[0]);
             } else {
@@ -1129,9 +1198,9 @@
             if (!cropperInstance) return;
             isUploading.value = true;
             
-            const isBg = currentUploadContext.value === 'bgImage';
-            const targetWidth = isBg ? 800 : 600;
-            const targetHeight = isBg ? 1000 : 600;
+            const isBgOrBtn = currentUploadContext.value === 'bgImage' || currentUploadContext.value === 'btnImage';
+            const targetWidth = isBgOrBtn ? 800 : 600;
+            const targetHeight = isBgOrBtn ? 1000 : 600;
 
             const fullBase64 = cropperInstance.getCroppedCanvas({ width: targetWidth, height: targetHeight }).toDataURL('image/jpeg', 0.85);
             const b64Data = fullBase64.split(',')[1];
@@ -1140,14 +1209,18 @@
             
             mediaImages.value.unshift(tempImg);
             
-            if (isBg) profile.value.bgImageUrl = fullBase64;
-            else profile.value.avatarUrl = fullBase64;
+            if (currentUploadContext.value === 'bgImage') profile.value.bgImageUrl = fullBase64;
+            else if (currentUploadContext.value === 'avatar') profile.value.avatarUrl = fullBase64;
+            else if (currentUploadContext.value === 'btnImage') {
+                if (!buttons.value[currentButtonIndex.value].images) buttons.value[currentButtonIndex.value].images = [];
+                buttons.value[currentButtonIndex.value].images.push(fullBase64);
+            }
             
-            showToast('圖片已即時套用！背景上傳雲端中...');
+            showToast('圖片已即時套用！上傳雲端中...');
             closeCropper();
             isUploading.value = false;
 
-            uploadToDrive(b64Data, 'image/jpeg', 'jpg', currentUser.value.profileFolderId, tempId, currentUploadContext.value, null);
+            uploadToDrive(b64Data, 'image/jpeg', 'jpg', currentUser.value.profileFolderId, tempId, currentUploadContext.value, currentButtonIndex.value);
         };
 
         const directUpload = (file) => {
@@ -1155,14 +1228,13 @@
             reader.onload = async (e) => {
                 const fullBase64 = e.target.result;
                 const b64Data = fullBase64.split(',')[1];
-                const isProfileContext = currentUploadContext.value === 'bgImage' || currentUploadContext.value === 'avatar';
-                const folderId = isProfileContext ? currentUser.value.profileFolderId : currentUser.value.slideFolderId;
+                const folderId = currentUser.value.slideFolderId;
                 
                 const tempId = 'temp_' + Date.now() + Math.random().toString(36).substr(2, 5);
                 const tempImg = { id: tempId, url: fullBase64, name: file.name };
                 
                 mediaImages.value.unshift(tempImg);
-                showToast('圖片已加入圖庫！背景上傳雲端中...');
+                showToast('圖片已加入圖庫！上傳雲端中...');
                 uploadToDrive(b64Data, file.type, file.name.split('.').pop(), folderId, tempId, currentUploadContext.value, currentButtonIndex.value);
             };
             reader.readAsDataURL(file);
@@ -1184,9 +1256,18 @@
                     swapCacheUrl(slideImagesCache.value);
                     swapCacheUrl(mediaImages.value);
                     
-                    if (context === 'avatar' && profile.value.avatarUrl === tempId) profile.value.avatarUrl = realUrl;
-                    else if (context === 'bgImage' && profile.value.bgImageUrl === tempId) profile.value.bgImageUrl = realUrl;
+                    if (context === 'avatar' && profile.value.avatarUrl === fullBase64) profile.value.avatarUrl = realUrl;
+                    else if (context === 'bgImage' && profile.value.bgImageUrl === fullBase64) profile.value.bgImageUrl = realUrl;
                     else if (context === 'slide' && index !== null && slides.value[index].imageUrl.includes('data:image')) slides.value[index].imageUrl = realUrl;
+                    else if (context === 'btnImage' && index !== null && buttons.value[index]) {
+                        // 更換剛才塞入的 Base64 成為正式網址
+                        let imgs = buttons.value[index].images;
+                        for(let i = 0; i < imgs.length; i++) {
+                            if(imgs[i].length > 1000) { 
+                                buttons.value[index].images[i] = realUrl;
+                            }
+                        }
+                    }
                 } else {
                     showToast('圖片雲端備份異常，請重新上傳', 'error');
                 }
@@ -1197,12 +1278,15 @@
             if (currentUploadContext.value === 'avatar') profile.value.avatarUrl = url;
             else if (currentUploadContext.value === 'bgImage') profile.value.bgImageUrl = url;
             else if (currentUploadContext.value === 'slide') slides.value[currentButtonIndex.value].imageUrl = url;
+            else if (currentUploadContext.value === 'btnImage') {
+                if (!buttons.value[currentButtonIndex.value].images) buttons.value[currentButtonIndex.value].images = [];
+                buttons.value[currentButtonIndex.value].images.push(url);
+            }
             isMediaModalOpen.value = false; 
         };
 
         const shareProfilePage = async () => {
             if (!currentUser.value) return;
-            // 系統自動抓取 GitHub 網址
             const shareUrl = 'https://rubybranddesign-cloud.github.io/e-line-card-share/' + currentUser.value.memberId + '/';
             const shareText = '哈囉！這是「' + (profile.value.name || currentUser.value.name) + '」的電子名片，請點擊連結查看：\n' + shareUrl;
             
@@ -1231,10 +1315,11 @@
           mobileViewModeProfile, mobileViewModeSlide, activePaletteId, togglePalette,
           isLoading, isFetchingData, isSaving, isSavingToken, toast, confirmModal, requestDelete, executeConfirm,
           handleLogin, handleRegister, handleForgotPassword, logout, saveAllData, saveSlidesData, saveLineToken, copyWebhookUrl, autoResize,
-          profile, buttons, slides, addNewButton, addNewSlide, duplicateSlide, moveItem, insertNewButton, insertNewSlide,
+          profile, buttons, slides, moveItem, insertNewButton, insertNewSlide,
           isMediaModalOpen, mediaImages, isLoadingImages, openMediaLibrary, closeMediaLibrary, selectImage,
           handleFileSelect, deleteGalleryImage, isCropModalOpen, isUploading, closeCropper, confirmCropAndUpload,
-          isProfileLinkCopied, shareProfilePage, isPublishingWeb, publishToWeb, GAS_API_URL
+          isProfileLinkCopied, shareProfilePage, isPublishingWeb, publishToWeb, GAS_API_URL,
+          handleTouchStart, handleTouchEnd, nextImg, prevImg
         };
       }
     }).mount('#app');
