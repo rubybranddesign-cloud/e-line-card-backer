@@ -171,13 +171,9 @@
                             <div class="text-2xl font-black text-center mb-1 tracking-wider" :style="{ color: profile.textColor }">{{ profile.name || '顯示名稱' }}</div>
                             <div class="text-[13px] text-center whitespace-pre-wrap leading-relaxed w-full break-words opacity-90" :style="{ color: profile.textColor }">{{ profile.bio || '尚未填寫自介' }}</div>
 
-                            <div v-if="profile.fbUrl || profile.igUrl || profile.lineUrl || profile.tiktokUrl || profile.wechatUrl" class="flex gap-4 mt-5 mb-2 justify-center items-center">
+                            <div v-if="profile.fbUrl || profile.igUrl || profile.tiktokUrl" class="flex gap-4 mt-5 mb-2 justify-center items-center">
                                 <a v-if="profile.fbUrl" :href="profile.fbUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-facebook-logo text-[28px]"></i></a>
                                 <a v-if="profile.igUrl" :href="profile.igUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-instagram-logo text-[28px]"></i></a>
-                                <a v-if="profile.lineUrl" :href="profile.lineUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }">
-                                    <svg viewBox="0 0 24 24" fill="currentColor" class="w-[28px] h-[28px]" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M24 12c0 6.627-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0s12 5.373 12 12zm-12-7.5c-4.606 0-8.25 3.03-8.25 6.75 0 3.35 2.5 6.17 6.13 6.68.25.05.58.15.65.37.06.2.04.5.02.7l-.1.65c-.03.2-.15.75.65.4 1-.45 5.5-2.3 7.4-4.25 1.25-1.25 1.75-2.7 1.75-4.3C20.25 7.53 16.606 4.5 12 4.5z" /></svg>
-                                </a>
-                                <a v-if="profile.wechatUrl" :href="profile.wechatUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-wechat-logo text-[28px]"></i></a>
                                 <a v-if="profile.tiktokUrl" :href="profile.tiktokUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-tiktok-logo text-[28px]"></i></a>
                             </div>
 
@@ -325,14 +321,6 @@
                             <div class="flex items-center gap-2">
                                 <i class="ph-fill ph-instagram-logo text-gray-400 text-xl w-6"></i>
                                 <input v-model="profile.igUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="Instagram 連結">
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <svg viewBox="0 0 24 24" fill="currentColor" class="text-gray-400 w-6 h-6 shrink-0" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M24 12c0 6.627-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0s12 5.373 12 12zm-12-7.5c-4.606 0-8.25 3.03-8.25 6.75 0 3.35 2.5 6.17 6.13 6.68.25.05.58.15.65.37.06.2.04.5.02.7l-.1.65c-.03.2-.15.75.65.4 1-.45 5.5-2.3 7.4-4.25 1.25-1.25 1.75-2.7 1.75-4.3C20.25 7.53 16.606 4.5 12 4.5z" /></svg>
-                                <input v-model="profile.lineUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="LINE 官方帳號/好友連結">
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <i class="ph-fill ph-wechat-logo text-gray-400 text-xl w-6"></i>
-                                <input v-model="profile.wechatUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="WeChat 連結">
                             </div>
                             <div class="flex items-center gap-2">
                                 <i class="ph-fill ph-tiktok-logo text-gray-400 text-xl w-6"></i>
@@ -756,7 +744,7 @@
             { val: 'url', label: '網頁連結' }, 
             { val: 'line', label: '+官方LINE' }, 
             { val: 'line_personal', label: '+個人LINE' }, 
-            { val: 'share', label: '轉發LINE好友' },
+            { val: 'share', label: '轉發電子名片' },
             { val: 'social', label: '社群媒體' }, 
             { val: 'tel', label: '電話撥打' }, 
             { val: 'email', label: '發送郵件' }
