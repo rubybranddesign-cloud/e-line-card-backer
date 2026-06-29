@@ -148,95 +148,108 @@
 
             <div class="flex flex-col lg:flex-row gap-8 justify-center items-start w-full min-w-0">
                 
-                <div class="sticky mockup-phone no-scrollbar transition-all shrink-0" :class="{'hidden lg:flex': mobileViewModeProfile === 'edit'}" style="top: max(96px, calc(50vh - 350px));">
-                    <div class="mockup-notch"></div>
+                <div class="sticky flex flex-col gap-4 transition-all shrink-0 w-[340px] mx-auto lg:mx-0" :class="{'hidden lg:flex': mobileViewModeProfile === 'edit'}" style="top: max(96px, calc(50vh - 380px));">
                     
-                    <div class="preview-body-container flex flex-col flex-1 transition-all duration-500 relative overflow-y-auto w-full no-scrollbar"
-                         :style="{ backgroundColor: profile.bgColor }">
+                    <div class="mockup-phone no-scrollbar shrink-0 w-full" style="margin: 0;">
+                        <div class="mockup-notch"></div>
                         
-                        <div v-if="profile.bgImageUrl" class="relative w-full aspect-[4/5] shrink-0 bg-cover bg-center flex flex-col justify-end items-center pb-[2px]" :style="{ backgroundImage: 'url(' + profile.bgImageUrl + ')' }">
-                            <div class="absolute bottom-0 left-0 w-full h-1/2" :style="{ background: 'linear-gradient(to top, ' + profile.bgColor + ' 0%, transparent 100%)' }"></div>
-                            <div class="relative z-10 mb-3">
-                                <img :src="profile.avatarUrl || 'https://via.placeholder.com/150'" class="w-[110px] h-[110px] rounded-full object-cover border-2 border-white/50 shadow-md bg-gray-100">
-                            </div>
-                        </div>
-
-                        <div v-else class="relative z-10 w-full flex flex-col items-center mt-[100px] shrink-0">
-                            <div class="relative mb-3">
-                                <img :src="profile.avatarUrl || 'https://via.placeholder.com/150'" class="w-[110px] h-[110px] rounded-full object-cover border-2 border-white/50 shadow-md bg-gray-100">
-                            </div>
-                        </div>
-
-                        <div class="relative z-10 w-full flex flex-col items-center px-6 pb-2">
-                            <div class="text-2xl font-black text-center mb-1 tracking-wider" :style="{ color: profile.textColor }">{{ profile.name || '顯示名稱' }}</div>
-                            <div class="text-[13px] text-center whitespace-pre-wrap leading-relaxed w-full break-words opacity-90" :style="{ color: profile.textColor }">{{ profile.bio || '尚未填寫自介' }}</div>
-
-                            <div v-if="profile.fbUrl || profile.igUrl || profile.tiktokUrl" class="flex gap-4 mt-5 mb-2 justify-center items-center">
-                                <a v-if="profile.fbUrl" :href="profile.fbUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-facebook-logo text-[28px]"></i></a>
-                                <a v-if="profile.igUrl" :href="profile.igUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-instagram-logo text-[28px]"></i></a>
-                                <a v-if="profile.tiktokUrl" :href="profile.tiktokUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-tiktok-logo text-[28px]"></i></a>
+                        <div class="preview-body-container flex flex-col flex-1 transition-all duration-500 relative overflow-y-auto w-full no-scrollbar"
+                             :style="{ backgroundColor: profile.bgColor }">
+                            
+                            <div v-if="profile.bgImageUrl" class="relative w-full aspect-[4/5] shrink-0 bg-cover bg-center flex flex-col justify-end items-center pb-[2px]" :style="{ backgroundImage: 'url(' + profile.bgImageUrl + ')' }">
+                                <div class="absolute bottom-0 left-0 w-full h-1/2" :style="{ background: 'linear-gradient(to top, ' + profile.bgColor + ' 0%, transparent 100%)' }"></div>
+                                <div class="relative z-10 mb-3">
+                                    <img :src="profile.avatarUrl || 'https://via.placeholder.com/150'" class="w-[110px] h-[110px] rounded-full object-cover border-2 border-white/50 shadow-md bg-gray-100">
+                                </div>
                             </div>
 
-                            <div v-if="profile.ytUrl && getVideoData(profile.ytUrl)" class="relative w-full mt-4 mb-2 rounded-xl overflow-hidden shadow-lg aspect-video bg-black shrink-0 border border-white/20">
-                                <iframe v-if="getVideoData(profile.ytUrl).type !== 'html5'" :src="getVideoData(profile.ytUrl).embedUrl" class="absolute inset-0 w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                                <video v-if="getVideoData(profile.ytUrl).type === 'html5'" :src="getVideoData(profile.ytUrl).embedUrl" class="absolute inset-0 w-full h-full" controls playsinline controlslist="nodownload"></video>
+                            <div v-else class="relative z-10 w-full flex flex-col items-center mt-[100px] shrink-0">
+                                <div class="relative mb-3">
+                                    <img :src="profile.avatarUrl || 'https://via.placeholder.com/150'" class="w-[110px] h-[110px] rounded-full object-cover border-2 border-white/50 shadow-md bg-gray-100">
+                                </div>
                             </div>
 
-                            <div class="w-full mt-5 space-y-4 pb-6">
-                                <template v-for="(btn, index) in buttons" :key="btn.id">
-                                    <a v-if="btn.btnType !== 'image'" :href="buildFinalLink(btn.type, btn.linkValue)" target="_blank"
-                                       class="w-full flex items-center justify-center font-bold px-4 py-[16px] transition cursor-pointer relative overflow-hidden group shadow-sm rounded-[13px]" 
-                                       :style="{ backgroundColor: btn.color || '#d4af37', color: btn.textColor || '#000000', textDecoration: 'none' }">
-                                       <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                       <span class="tracking-widest text-[15px]">{{ btn.title || '按鈕文字' }}</span>
-                                    </a>
+                            <div class="relative z-10 w-full flex flex-col items-center px-6 pb-2">
+                                <div class="text-2xl font-black text-center mb-1 tracking-wider" :style="{ color: profile.textColor }">{{ profile.name || '顯示名稱' }}</div>
+                                <div class="text-[13px] text-center whitespace-pre-wrap leading-relaxed w-full break-words opacity-90" :style="{ color: profile.textColor }">{{ profile.bio || '尚未填寫自介' }}</div>
 
-                                    <div v-else class="w-full aspect-[4/5] relative rounded-[13px] overflow-hidden shadow-sm group transform transition hover:opacity-[0.98] select-none"
-                                         @touchstart="handleTouchStart($event)"
-                                         @touchend="handleTouchEnd($event, btn)">
-                                        <a :href="buildFinalLink(btn.images[btn.currentImgIdx || 0]?.linkType || btn.type || 'url', btn.images[btn.currentImgIdx || 0]?.linkValue || btn.linkValue || '')" target="_blank" class="block w-full h-full relative cursor-pointer bg-gray-100">
-                                            <transition-group name="fade">
-                                                <img v-for="(imgObj, i) in btn.images" :key="imgObj.url + i" v-show="(btn.currentImgIdx || 0) === i" :src="imgObj.url" class="absolute inset-0 w-full h-full object-cover">
-                                            </transition-group>
-                                            <div v-if="!btn.images || btn.images.length === 0" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
-                                                <i class="ph-fill ph-image text-3xl mb-1"></i>
-                                                <span class="text-[10px] font-bold">請於編輯區上傳圖片</span>
-                                            </div>
+                                <div v-if="profile.fbUrl || profile.igUrl || profile.tiktokUrl" class="flex gap-4 mt-5 mb-2 justify-center items-center">
+                                    <a v-if="profile.fbUrl" :href="profile.fbUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-facebook-logo text-[28px]"></i></a>
+                                    <a v-if="profile.igUrl" :href="profile.igUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-instagram-logo text-[28px]"></i></a>
+                                    <a v-if="profile.tiktokUrl" :href="profile.tiktokUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-tiktok-logo text-[28px]"></i></a>
+                                </div>
+
+                                <div v-if="profile.ytUrl && getVideoData(profile.ytUrl)" class="relative w-full mt-4 mb-2 rounded-xl overflow-hidden shadow-lg aspect-video bg-black shrink-0 border border-white/20">
+                                    <iframe v-if="getVideoData(profile.ytUrl).type !== 'html5'" :src="getVideoData(profile.ytUrl).embedUrl" class="absolute inset-0 w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    <video v-if="getVideoData(profile.ytUrl).type === 'html5'" :src="getVideoData(profile.ytUrl).embedUrl" class="absolute inset-0 w-full h-full" controls playsinline controlslist="nodownload"></video>
+                                </div>
+
+                                <div class="w-full mt-5 space-y-4 pb-6">
+                                    <template v-for="(btn, index) in buttons" :key="btn.id">
+                                        <a v-if="btn.btnType !== 'image'" :href="buildFinalLink(btn.type, btn.linkValue)" target="_blank"
+                                           class="w-full flex items-center justify-center font-bold px-4 py-[16px] transition cursor-pointer relative overflow-hidden group shadow-sm rounded-[13px]" 
+                                           :style="{ backgroundColor: btn.color || '#d4af37', color: btn.textColor || '#000000', textDecoration: 'none' }">
+                                           <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                           <span class="tracking-widest text-[15px]">{{ btn.title || '按鈕文字' }}</span>
                                         </a>
-                                        <div v-if="btn.images && btn.images.length > 1" class="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5 z-20 pointer-events-none">
-                                            <div v-for="(imgObj, i) in btn.images" :key="'dot'+i" class="w-1.5 h-1.5 rounded-full transition-all duration-300 shadow-sm" :class="(btn.currentImgIdx || 0) === i ? 'bg-white scale-110' : 'bg-white/50'"></div>
+
+                                        <div v-else class="w-full aspect-[4/5] relative rounded-[13px] overflow-hidden shadow-sm group transform transition hover:opacity-[0.98] select-none"
+                                             @touchstart="handleTouchStart($event)"
+                                             @touchend="handleTouchEnd($event, btn)">
+                                            <a :href="buildFinalLink(btn.images[btn.currentImgIdx || 0]?.linkType || btn.type || 'url', btn.images[btn.currentImgIdx || 0]?.linkValue || btn.linkValue || '')" target="_blank" class="block w-full h-full relative cursor-pointer bg-gray-100">
+                                                <transition-group name="fade">
+                                                    <img v-for="(imgObj, i) in btn.images" :key="imgObj.url + i" v-show="(btn.currentImgIdx || 0) === i" :src="imgObj.url" class="absolute inset-0 w-full h-full object-cover">
+                                                </transition-group>
+                                                <div v-if="!btn.images || btn.images.length === 0" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
+                                                    <i class="ph-fill ph-image text-3xl mb-1"></i>
+                                                    <span class="text-[10px] font-bold">請於編輯區上傳圖片</span>
+                                                </div>
+                                            </a>
+                                            <div v-if="btn.images && btn.images.length > 1" class="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5 z-20 pointer-events-none">
+                                                <div v-for="(imgObj, i) in btn.images" :key="'dot'+i" class="w-1.5 h-1.5 rounded-full transition-all duration-300 shadow-sm" :class="(btn.currentImgIdx || 0) === i ? 'bg-white scale-110' : 'bg-white/50'"></div>
+                                            </div>
+                                            <button v-if="btn.images && btn.images.length > 1" @click.stop.prevent="prevImg(btn)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/20 text-white rounded-full p-1.5 z-20 hover:bg-black/50 transition opacity-0 lg:group-hover:opacity-100"><i class="ph-bold ph-caret-left"></i></button>
+                                            <button v-if="btn.images && btn.images.length > 1" @click.stop.prevent="nextImg(btn)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/20 text-white rounded-full p-1.5 z-20 hover:bg-black/50 transition opacity-0 lg:group-hover:opacity-100"><i class="ph-bold ph-caret-right"></i></button>
                                         </div>
-                                        <button v-if="btn.images && btn.images.length > 1" @click.stop.prevent="prevImg(btn)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/20 text-white rounded-full p-1.5 z-20 hover:bg-black/50 transition opacity-0 lg:group-hover:opacity-100"><i class="ph-bold ph-caret-left"></i></button>
-                                        <button v-if="btn.images && btn.images.length > 1" @click.stop.prevent="nextImg(btn)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/20 text-white rounded-full p-1.5 z-20 hover:bg-black/50 transition opacity-0 lg:group-hover:opacity-100"><i class="ph-bold ph-caret-right"></i></button>
-                                    </div>
-                                </template>
-                            </div>
-                            
-                            <div v-if="slides && slides.length > 0" class="w-full mt-2 pb-10">
-                                <div class="flex items-center gap-3 mb-4 px-2">
-                                    <div class="h-[1px] flex-1 bg-black/10" :style="{ backgroundColor: profile.textColor, opacity: 0.15 }"></div>
-                                    <span class="text-[10px] font-black tracking-widest uppercase" :style="{ color: profile.textColor, opacity: 0.6 }">Highlights</span>
-                                    <div class="h-[1px] flex-1 bg-black/10" :style="{ backgroundColor: profile.textColor, opacity: 0.15 }"></div>
+                                    </template>
                                 </div>
-                                <div class="flex gap-4 overflow-x-auto no-scrollbar px-2 pb-6 snap-x snap-mandatory">
-                                    <div v-for="slide in slides" :key="slide.id" class="line-card flex flex-col shrink-0" :style="{ backgroundColor: slide.bgColor || '#ffffff' }">
-                                        <div class="relative w-full aspect-[1080/1680] bg-gray-100 overflow-hidden shrink-0 border-b border-gray-100/50">
-                                            <img v-if="slide.imageUrl" :src="slide.imageUrl" class="absolute inset-0 w-full h-full object-cover object-center">
-                                            <div v-else class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 bg-gray-200">
-                                                <i class="ph ph-image text-4xl mb-2"></i><span class="text-[10px] font-bold px-4 text-center">固定比例 (1080x1680)<br>極致滿版設計</span>
+                                
+                                <div v-if="slides && slides.length > 0" class="w-full mt-2 pb-10">
+                                    <div class="flex items-center gap-3 mb-4 px-2">
+                                        <div class="h-[1px] flex-1 bg-black/10" :style="{ backgroundColor: profile.textColor, opacity: 0.15 }"></div>
+                                        <span class="text-[10px] font-black tracking-widest uppercase" :style="{ color: profile.textColor, opacity: 0.6 }">Highlights</span>
+                                        <div class="h-[1px] flex-1 bg-black/10" :style="{ backgroundColor: profile.textColor, opacity: 0.15 }"></div>
+                                    </div>
+                                    <div class="flex gap-4 overflow-x-auto no-scrollbar px-2 pb-6 snap-x snap-mandatory">
+                                        <div v-for="slide in slides" :key="slide.id" class="line-card flex flex-col shrink-0" :style="{ backgroundColor: slide.bgColor || '#ffffff' }">
+                                            <div class="relative w-full aspect-[1080/1680] bg-gray-100 overflow-hidden shrink-0 border-b border-gray-100/50">
+                                                <img v-if="slide.imageUrl" :src="slide.imageUrl" class="absolute inset-0 w-full h-full object-cover object-center">
+                                                <div v-else class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 bg-gray-200">
+                                                    <i class="ph ph-image text-4xl mb-2"></i><span class="text-[10px] font-bold px-4 text-center">固定比例 (1080x1680)<br>極致滿版設計</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex flex-col gap-[10px] pt-[13px] pb-[12px] px-[8px] flex-1" :style="{ backgroundColor: slide.bgColor || '#ffffff' }">
+                                                <a v-for="(sBtn, bIdx) in slide.buttons" :key="bIdx" :href="buildFinalLink(sBtn.type, sBtn.linkValue)" target="_blank" class="rounded-lg py-[10px] text-center text-[14px] font-bold hover:opacity-80 transition" :style="{ backgroundColor: sBtn.color || '#6C0B22', color: slide.buttonTextColor || '#ffffff', fontFamily: getFontFamily(slide.buttonFont) }">
+                                                    {{ sBtn.title || '按鈕文字' }}
+                                                </a>
                                             </div>
                                         </div>
-                                        <div class="flex flex-col gap-[10px] pt-[13px] pb-[12px] px-[8px] flex-1" :style="{ backgroundColor: slide.bgColor || '#ffffff' }">
-                                            <a v-for="(sBtn, bIdx) in slide.buttons" :key="bIdx" :href="buildFinalLink(sBtn.type, sBtn.linkValue)" target="_blank" class="rounded-lg py-[10px] text-center text-[14px] font-bold hover:opacity-80 transition" :style="{ backgroundColor: sBtn.color || '#6C0B22', color: slide.buttonTextColor || '#ffffff', fontFamily: getFontFamily(slide.buttonFont) }">
-                                                {{ sBtn.title || '按鈕文字' }}
-                                            </a>
-                                        </div>
                                     </div>
                                 </div>
+                                
                             </div>
-                            
                         </div>
                     </div>
+
+                    <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 w-full shrink-0">
+                        <label class="text-[11px] font-bold text-gray-500 mb-2 flex items-center gap-1"><i class="ph-fill ph-link text-pink-500"></i> 個性化網址結尾 (自訂專屬連結)</label>
+                        <div class="flex items-center bg-gray-50 border border-gray-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-pink-400 transition-all">
+                            <span class="pl-3 py-2 text-[10px] text-gray-400 font-mono select-none">.../e-line-card-share/</span>
+                            <input v-model="profile.customUrl" type="text" class="flex-1 w-full min-w-0 text-sm font-bold py-2 pr-3 outline-none bg-transparent text-gray-800 placeholder-gray-300" placeholder="例如: troy168">
+                        </div>
+                        <p class="text-[10px] text-gray-400 mt-2">設定後將取代會員ID，成為您的專屬公開網址。請使用英數字組合。</p>
+                    </div>
+
                 </div>
 
                 <div class="w-full max-w-full lg:w-[500px] min-w-0" :class="{'hidden lg:block': mobileViewModeProfile === 'preview'}">
@@ -309,15 +322,6 @@
                         </div>
                         <label class="text-[11px] font-bold text-gray-500 mb-1 block">自我介紹 (自動換行)</label>
                         <textarea id="bio-textarea-edit" v-model="profile.bio" @input="autoResize('bio-textarea-edit')" class="w-full max-w-full min-w-0 text-sm p-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-pink-400 bg-gray-50 resize-none overflow-hidden" rows="2" placeholder="寫一段簡短的介紹..."></textarea>
-                        
-                        <div class="mt-4 pt-4 border-t border-gray-100">
-                            <label class="text-[11px] font-bold text-gray-500 mb-1 block">個性化專屬網址 (限英文數字)</label>
-                            <div class="flex items-center">
-                                <span class="text-xs text-gray-400 bg-gray-100 p-2.5 rounded-l-xl border border-r-0 border-gray-200 truncate">.../e-line-card-share/</span>
-                                <input v-model="profile.customUrl" @input="profile.customUrl = profile.customUrl.replace(/[^a-zA-Z0-9_-]/g, '')" class="w-full text-sm font-bold p-2.5 rounded-r-xl border border-gray-200 outline-none focus:ring-2 focus:ring-pink-400 bg-gray-50" placeholder="自訂網址，留白則用系統ID">
-                            </div>
-                            <p class="text-[10px] text-pink-500 mt-1">* 若設定此欄位，發佈至 Github 的網址將使用此名稱</p>
-                        </div>
                     </div>
 
                     <div class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 mb-5 w-full min-w-0">
@@ -837,7 +841,7 @@
 
         const profile = ref({ 
             avatarUrl: '', name: '', bio: '', bgColor: '#dddddd', bgImageUrl: '', textColor: '#1a1a1a', 
-            socialIconColor: '#000000', fbUrl: '', igUrl: '', lineUrl: '', tiktokUrl: '', ytUrl: '', wechatUrl: '', customUrl: '', lineToken: ''
+            socialIconColor: '#000000', fbUrl: '', igUrl: '', lineUrl: '', tiktokUrl: '', ytUrl: '', wechatUrl: '', lineToken: '', customUrl: ''
         });
         const buttons = ref([]);
         const slides = ref([]); 
@@ -1059,6 +1063,11 @@
             isSaving.value = true; 
             activePaletteId.value = null;
             try {
+                if (profile.value.customUrl && !/^[a-zA-Z0-9_-]+$/.test(profile.value.customUrl)) {
+                    showToast('個性化網址僅能包含英數字、減號(-)與底線(_)', 'error');
+                    isSaving.value = false;
+                    return;
+                }
                 const payloadButtons = buttons.value.map(b => ({ 
                     ...b, 
                     id: b.id || createUniqueId('btn'), 
@@ -1069,7 +1078,9 @@
                 const res = await apiCall({ action: 'saveAll', memberId: currentUser.value.memberId, profile: profile.value, buttons: payloadButtons });
                 if(res.status === 'success') showToast('Profile 已同步更新'); 
                 else showToast(res.message || '儲存失敗', 'error');
-            } finally { isSaving.value = false; }
+            } catch(e) {
+                showToast('伺服器連線異常', 'error');
+            } finally { if(isSaving.value) isSaving.value = false; }
         };
         
         const saveSlidesData = async () => {
@@ -1090,6 +1101,11 @@
         const publishToWeb = async () => {
             isPublishingWeb.value = true;
             try {
+                if (profile.value.customUrl && !/^[a-zA-Z0-9_-]+$/.test(profile.value.customUrl)) {
+                    showToast('個性化網址僅能包含英數字、減號(-)與底線(_)', 'error');
+                    isPublishingWeb.value = false;
+                    return;
+                }
                 const payloadButtons = buttons.value.map(b => ({ 
                     ...b, 
                     id: b.id || createUniqueId('btn'), 
@@ -1097,7 +1113,13 @@
                     imageUrls: Array.isArray(b.images) ? b.images.map(img => img.url).join(',') : '',
                     images: b.images
                 }));
-                await apiCall({ action: 'saveAll', memberId: currentUser.value.memberId, profile: profile.value, buttons: payloadButtons });
+                const saveRes = await apiCall({ action: 'saveAll', memberId: currentUser.value.memberId, profile: profile.value, buttons: payloadButtons });
+                
+                if (saveRes.status !== 'success') {
+                    showToast(saveRes.message || '儲存失敗，請檢查網址是否重複', 'error');
+                    isPublishingWeb.value = false;
+                    return;
+                }
                 
                 const res = await apiCall({ action: 'publishToWeb', memberId: currentUser.value.memberId });
                 
@@ -1314,8 +1336,8 @@
 
         const shareProfilePage = async () => {
             if (!currentUser.value) return;
-            const slug = profile.value.customUrl || currentUser.value.memberId;
-            const shareUrl = 'https://rubybranddesign-cloud.github.io/e-line-card-share/' + slug + '/';
+            const customPath = profile.value.customUrl ? profile.value.customUrl : currentUser.value.memberId;
+            const shareUrl = 'https://rubybranddesign-cloud.github.io/e-line-card-share/' + customPath + '/';
             const shareText = '哈囉！這是「' + (profile.value.name || currentUser.value.name) + '」的電子名片，請點擊連結查看：\n' + shareUrl;
             
             try {
