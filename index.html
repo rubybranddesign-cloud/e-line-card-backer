@@ -309,6 +309,15 @@
                         </div>
                         <label class="text-[11px] font-bold text-gray-500 mb-1 block">自我介紹 (自動換行)</label>
                         <textarea id="bio-textarea-edit" v-model="profile.bio" @input="autoResize('bio-textarea-edit')" class="w-full max-w-full min-w-0 text-sm p-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-pink-400 bg-gray-50 resize-none overflow-hidden" rows="2" placeholder="寫一段簡短的介紹..."></textarea>
+                        
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <label class="text-[11px] font-bold text-gray-500 mb-1 block">個性化專屬網址 (限英文數字)</label>
+                            <div class="flex items-center">
+                                <span class="text-xs text-gray-400 bg-gray-100 p-2.5 rounded-l-xl border border-r-0 border-gray-200 truncate">.../e-line-card-share/</span>
+                                <input v-model="profile.customUrl" @input="profile.customUrl = profile.customUrl.replace(/[^a-zA-Z0-9_-]/g, '')" class="w-full text-sm font-bold p-2.5 rounded-r-xl border border-gray-200 outline-none focus:ring-2 focus:ring-pink-400 bg-gray-50" placeholder="自訂網址，留白則用系統ID">
+                            </div>
+                            <p class="text-[10px] text-pink-500 mt-1">* 若設定此欄位，發佈至 Github 的網址將使用此名稱</p>
+                        </div>
                     </div>
 
                     <div class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 mb-5 w-full min-w-0">
@@ -828,7 +837,7 @@
 
         const profile = ref({ 
             avatarUrl: '', name: '', bio: '', bgColor: '#dddddd', bgImageUrl: '', textColor: '#1a1a1a', 
-            socialIconColor: '#000000', fbUrl: '', igUrl: '', lineUrl: '', tiktokUrl: '', ytUrl: '', wechatUrl: '', lineToken: ''
+            socialIconColor: '#000000', fbUrl: '', igUrl: '', lineUrl: '', tiktokUrl: '', ytUrl: '', wechatUrl: '', customUrl: '', lineToken: ''
         });
         const buttons = ref([]);
         const slides = ref([]); 
@@ -1059,7 +1068,7 @@
                 }));
                 const res = await apiCall({ action: 'saveAll', memberId: currentUser.value.memberId, profile: profile.value, buttons: payloadButtons });
                 if(res.status === 'success') showToast('Profile 已同步更新'); 
-                else showToast('儲存失敗', 'error');
+                else showToast(res.message || '儲存失敗', 'error');
             } finally { isSaving.value = false; }
         };
         
@@ -1305,7 +1314,8 @@
 
         const shareProfilePage = async () => {
             if (!currentUser.value) return;
-            const shareUrl = 'https://rubybranddesign-cloud.github.io/e-line-card-share/' + currentUser.value.memberId + '/';
+            const slug = profile.value.customUrl || currentUser.value.memberId;
+            const shareUrl = 'https://rubybranddesign-cloud.github.io/e-line-card-share/' + slug + '/';
             const shareText = '哈囉！這是「' + (profile.value.name || currentUser.value.name) + '」的電子名片，請點擊連結查看：\n' + shareUrl;
             
             try {
