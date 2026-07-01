@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>RubyBrandDesign 電子名片系統</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+TC:wght@400;700;900&family=Noto+Serif+TC:wght@400;700;900&family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+  
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -11,7 +15,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
   <style>
     html, body { 
-        font-family: 'Inter', sans-serif; 
+        font-family: 'Inter', 'Noto Sans TC', sans-serif; 
         background-image: url('https://drive.google.com/thumbnail?id=13vLMiDFzhmderx31P6UvMuUT4NONCdps&sz=w1000');
         background-size: cover;
         background-position: center;
@@ -170,13 +174,19 @@
                             </div>
 
                             <div class="relative z-10 w-full flex flex-col items-center px-6 pb-2">
-                                <div class="text-2xl font-black text-center mb-1 tracking-wider" :style="{ color: profile.textColor }">{{ profile.name || '顯示名稱' }}</div>
-                                <div class="text-[13px] text-center whitespace-pre-wrap leading-relaxed w-full break-words opacity-90" :style="{ color: profile.textColor }">{{ profile.bio || '尚未填寫自介' }}</div>
+                                <div class="text-2xl font-black text-center mb-1 tracking-wider" :style="{ color: profile.textColor, fontFamily: getFontFamily(profile.titleFont) }">{{ profile.name || '顯示名稱' }}</div>
+                                <div class="text-[13px] text-center whitespace-pre-wrap leading-relaxed w-full break-words opacity-90" :style="{ color: profile.textColor, fontFamily: getFontFamily(profile.bioFont) }">{{ profile.bio || '尚未填寫自介' }}</div>
 
-                                <div v-if="profile.fbUrl || profile.igUrl || profile.tiktokUrl" class="flex gap-4 mt-5 mb-2 justify-center items-center">
+                                <div v-if="profile.fbUrl || profile.igUrl || profile.tiktokUrl || profile.threadsUrl || profile.whatsappUrl || profile.linkedinUrl || profile.podcastUrl || profile.wechatUrl || profile.ytChannelUrl" class="flex flex-wrap gap-4 mt-5 mb-2 justify-center items-center">
                                     <a v-if="profile.fbUrl" :href="profile.fbUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-facebook-logo text-[28px]"></i></a>
                                     <a v-if="profile.igUrl" :href="profile.igUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-instagram-logo text-[28px]"></i></a>
+                                    <a v-if="profile.threadsUrl" :href="profile.threadsUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-threads-logo text-[28px]"></i></a>
                                     <a v-if="profile.tiktokUrl" :href="profile.tiktokUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-tiktok-logo text-[28px]"></i></a>
+                                    <a v-if="profile.ytChannelUrl" :href="profile.ytChannelUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-youtube-logo text-[28px]"></i></a>
+                                    <a v-if="profile.whatsappUrl" :href="profile.whatsappUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-whatsapp-logo text-[28px]"></i></a>
+                                    <a v-if="profile.linkedinUrl" :href="profile.linkedinUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-linkedin-logo text-[28px]"></i></a>
+                                    <a v-if="profile.wechatUrl" :href="profile.wechatUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-wechat-logo text-[28px]"></i></a>
+                                    <a v-if="profile.podcastUrl" :href="profile.podcastUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-podcast text-[28px]"></i></a>
                                 </div>
 
                                 <div v-if="profile.ytUrl && getVideoData(profile.ytUrl)" class="relative w-full mt-4 mb-2 rounded-xl overflow-hidden shadow-lg aspect-video bg-black shrink-0 border border-white/20">
@@ -188,7 +198,7 @@
                                     <template v-for="(btn, index) in buttons" :key="btn.id">
                                         <a v-if="btn.btnType !== 'image'" :href="buildFinalLink(btn.type, btn.linkValue)" target="_blank"
                                            class="w-full flex items-center justify-center font-bold px-4 py-[16px] transition cursor-pointer relative overflow-hidden group shadow-sm rounded-[13px]" 
-                                           :style="{ backgroundColor: btn.color || '#d4af37', color: btn.textColor || '#000000', textDecoration: 'none' }">
+                                           :style="{ backgroundColor: btn.color || '#d4af37', color: btn.textColor || '#000000', textDecoration: 'none', fontFamily: getFontFamily(btn.font) }">
                                            <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                            <span class="tracking-widest text-[15px]">{{ btn.title || '按鈕文字' }}</span>
                                         </a>
@@ -310,6 +320,28 @@
 
                     <div class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 mb-5 w-full min-w-0">
                         <h3 class="font-black text-base mb-4 text-gray-800 border-b pb-2 flex items-center gap-2"><i class="ph-fill ph-user text-blue-500"></i> 基本資料設定</h3>
+                        
+                        <div class="flex gap-4 mb-4">
+                            <div class="flex-1 relative">
+                                <label class="text-[11px] font-bold text-gray-500 mb-1">主標題字體</label>
+                                <div class="relative">
+                                    <select v-model="profile.titleFont" class="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-600 font-bold px-3 py-2 rounded-xl outline-none focus:ring-2 focus:ring-pink-400 text-xs cursor-pointer">
+                                        <option value="預設字體">預設字體</option><option value="黑體">黑體</option><option value="明體">明體</option><option value="圓體">圓體</option>
+                                    </select>
+                                    <i class="ph-bold ph-caret-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1 relative">
+                                <label class="text-[11px] font-bold text-gray-500 mb-1">敘述文字體</label>
+                                <div class="relative">
+                                    <select v-model="profile.bioFont" class="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-600 font-bold px-3 py-2 rounded-xl outline-none focus:ring-2 focus:ring-pink-400 text-xs cursor-pointer">
+                                        <option value="預設字體">預設字體</option><option value="黑體">黑體</option><option value="明體">明體</option><option value="圓體">圓體</option>
+                                    </select>
+                                    <i class="ph-bold ph-caret-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="flex gap-4 mb-4 min-w-0">
                             <div @click.stop="openMediaLibrary('avatar')" class="w-20 h-20 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer relative overflow-hidden group shrink-0">
                                 <img v-if="profile.avatarUrl" :src="profile.avatarUrl" class="w-full h-full object-cover">
@@ -328,20 +360,46 @@
                         <h3 class="font-black text-base mb-4 text-gray-800 border-b pb-2 flex items-center gap-2"><i class="ph-fill ph-share-network text-purple-500"></i> 社群與影音連結</h3>
                         <div class="space-y-3">
                             <div class="flex items-center gap-2">
+                                <i class="ph-fill ph-instagram-logo text-gray-400 text-xl w-6"></i>
+                                <input v-model="profile.igUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="Instagram 連結">
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="ph-fill ph-threads-logo text-gray-400 text-xl w-6"></i>
+                                <input v-model="profile.threadsUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="Threads 連結">
+                            </div>
+                            <div class="flex items-center gap-2">
                                 <i class="ph-fill ph-facebook-logo text-gray-400 text-xl w-6"></i>
                                 <input v-model="profile.fbUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="Facebook 連結">
                             </div>
                             <div class="flex items-center gap-2">
-                                <i class="ph-fill ph-instagram-logo text-gray-400 text-xl w-6"></i>
-                                <input v-model="profile.igUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="Instagram 連結">
+                                <i class="ph-fill ph-youtube-logo text-gray-400 text-xl w-6"></i>
+                                <input v-model="profile.ytChannelUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="YouTube 頻道連結 (純社群 Icon 導流)">
                             </div>
                             <div class="flex items-center gap-2">
                                 <i class="ph-fill ph-tiktok-logo text-gray-400 text-xl w-6"></i>
                                 <input v-model="profile.tiktokUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="TikTok 連結">
                             </div>
+                            <div class="flex items-center gap-2">
+                                <i class="ph-fill ph-whatsapp-logo text-gray-400 text-xl w-6"></i>
+                                <input v-model="profile.whatsappUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="WhatsApp 連結">
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="ph-fill ph-linkedin-logo text-gray-400 text-xl w-6"></i>
+                                <input v-model="profile.linkedinUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="LinkedIn 連結">
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="ph-fill ph-wechat-logo text-gray-400 text-xl w-6"></i>
+                                <input v-model="profile.wechatUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="WeChat 連結">
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="ph-fill ph-podcast text-gray-400 text-xl w-6"></i>
+                                <input v-model="profile.podcastUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="Podcast 連結">
+                            </div>
+                            
                             <div class="flex items-center gap-2 mt-4 pt-4 border-t border-gray-100">
                                 <i class="ph-fill ph-video-camera text-gray-800 text-2xl w-6"></i>
-                                <input v-model="profile.ytUrl" class="w-full text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="影音連結 (僅支援YouTube,Vimeo等影音平台，不支援雲端硬碟影音檔網址 )">                            </div>
+                                <input v-model="profile.ytUrl" class="w-full text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="影音預覽框連結 (僅支援YouTube, Vimeo等)">                            
+                            </div>
                         </div>
                     </div>
 
@@ -421,6 +479,13 @@
                                     <span class="text-[10px] font-bold text-gray-500 flex items-center gap-1 shrink-0"><i class="ph-fill ph-cursor-click"></i> {{ btn.clicks || 0 }} 點擊</span>
                                     
                                     <div v-if="btn.btnType !== 'image'" class="flex gap-2 shrink-0">
+                                        <div class="relative w-[75px] shrink-0">
+                                            <select v-model="btn.font" class="w-full appearance-none bg-white border border-gray-200 text-gray-600 font-bold px-2 py-1.5 rounded-lg outline-none focus:ring-1 focus:ring-pink-400 text-[10px] cursor-pointer shadow-sm">
+                                                <option value="預設字體">字體</option><option value="黑體">黑體</option><option value="明體">明體</option><option value="圓體">圓體</option>
+                                            </select>
+                                            <i class="ph-bold ph-caret-down absolute right-1.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-[10px]"></i>
+                                        </div>
+
                                         <div class="relative">
                                             <button @click.stop="togglePalette('btnText_' + btn.id)" class="text-[10px] font-bold bg-white border px-2 py-1.5 rounded-lg flex items-center gap-1 hover:bg-gray-100 transition" title="按鈕文字色">
                                                 <span class="w-3 h-3 border border-gray-300 rounded-sm" :style="{backgroundColor: btn.textColor || '#000000'}"></span> 字色
@@ -841,7 +906,9 @@
 
         const profile = ref({ 
             avatarUrl: '', name: '', bio: '', bgColor: '#dddddd', bgImageUrl: '', textColor: '#1a1a1a', 
-            socialIconColor: '#000000', fbUrl: '', igUrl: '', lineUrl: '', tiktokUrl: '', ytUrl: '', wechatUrl: '', lineToken: '', customUrl: ''
+            socialIconColor: '#000000', fbUrl: '', igUrl: '', lineUrl: '', tiktokUrl: '', ytUrl: '', 
+            wechatUrl: '', threadsUrl: '', whatsappUrl: '', linkedinUrl: '', podcastUrl: '', ytChannelUrl: '',
+            lineToken: '', customUrl: '', titleFont: '預設字體', bioFont: '預設字體'
         });
         const buttons = ref([]);
         const slides = ref([]); 
@@ -884,6 +951,9 @@
 
                 if(pRes.status === 'success' && pRes.data) {
                     profile.value = { ...profile.value, ...pRes.data };
+                    // 為了相容對應的擴充欄位，未來與後端對接後能直接吃到。目前先保留為預設值。
+                    if (!profile.value.titleFont) profile.value.titleFont = '預設字體';
+                    if (!profile.value.bioFont) profile.value.bioFont = '預設字體';
                 }
                 
                 if(bRes.status === 'success' && bRes.data) {
@@ -903,6 +973,7 @@
                             type: parsed.type, 
                             linkValue: parsed.value, 
                             textColor: b.textColor || '#000000',
+                            font: b.font || '預設字體', // 針對按鈕的字體擴充
                             btnType: b.btnType || b['按鈕類型'] || 'button',
                             images: parsedImages,
                             currentImgIdx: 0
@@ -1016,7 +1087,7 @@
         
         const insertNewButton = (index) => {
             buttons.value.splice(index + 1, 0, {
-                id: createUniqueId('btn'), type: 'url', title: '', linkValue: '', color: '#d4af37', textColor: '#000000', iconUrl: '', clicks: 0, btnType: 'button', images: [], currentImgIdx: 0
+                id: createUniqueId('btn'), type: 'url', title: '', linkValue: '', color: '#d4af37', textColor: '#000000', iconUrl: '', clicks: 0, btnType: 'button', images: [], currentImgIdx: 0, font: '預設字體'
             });
         };
         
