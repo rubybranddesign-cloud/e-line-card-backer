@@ -15,7 +15,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
   <style>
     html, body { 
-        font-family: 'Inter', 'Noto Sans TC', sans-serif; 
+        font-family: 'Inter', sans-serif; 
         background-image: url('https://drive.google.com/thumbnail?id=13vLMiDFzhmderx31P6UvMuUT4NONCdps&sz=w1000');
         background-size: cover;
         background-position: center;
@@ -321,24 +321,20 @@
                     <div class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 mb-5 w-full min-w-0">
                         <h3 class="font-black text-base mb-4 text-gray-800 border-b pb-2 flex items-center gap-2"><i class="ph-fill ph-user text-blue-500"></i> 基本資料設定</h3>
                         
-                        <div class="flex gap-4 mb-4">
-                            <div class="flex-1 relative">
-                                <label class="text-[11px] font-bold text-gray-500 mb-1">主標題字體</label>
-                                <div class="relative">
-                                    <select v-model="profile.titleFont" class="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-600 font-bold px-3 py-2 rounded-xl outline-none focus:ring-2 focus:ring-pink-400 text-xs cursor-pointer">
-                                        <option value="預設字體">預設字體</option><option value="黑體">黑體</option><option value="明體">明體</option><option value="圓體">圓體</option>
-                                    </select>
-                                    <i class="ph-bold ph-caret-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i>
-                                </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div class="flex flex-col gap-1 relative">
+                                <label class="text-[11px] font-bold text-gray-500">主標題字體</label>
+                                <select v-model="profile.titleFont" class="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-600 font-bold px-3 py-2 rounded-xl outline-none focus:ring-2 focus:ring-pink-400 text-xs cursor-pointer shadow-inner">
+                                    <option value="預設字體">預設字體</option><option value="黑體">黑體</option><option value="明體">明體</option><option value="圓體">圓體</option>
+                                </select>
+                                <i class="ph-bold ph-caret-down absolute right-3 bottom-2.5 text-gray-400 pointer-events-none text-xs"></i>
                             </div>
-                            <div class="flex-1 relative">
-                                <label class="text-[11px] font-bold text-gray-500 mb-1">敘述文字體</label>
-                                <div class="relative">
-                                    <select v-model="profile.bioFont" class="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-600 font-bold px-3 py-2 rounded-xl outline-none focus:ring-2 focus:ring-pink-400 text-xs cursor-pointer">
-                                        <option value="預設字體">預設字體</option><option value="黑體">黑體</option><option value="明體">明體</option><option value="圓體">圓體</option>
-                                    </select>
-                                    <i class="ph-bold ph-caret-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i>
-                                </div>
+                            <div class="flex flex-col gap-1 relative">
+                                <label class="text-[11px] font-bold text-gray-500">敘述文字體</label>
+                                <select v-model="profile.bioFont" class="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-600 font-bold px-3 py-2 rounded-xl outline-none focus:ring-2 focus:ring-pink-400 text-xs cursor-pointer shadow-inner">
+                                    <option value="預設字體">預設字體</option><option value="黑體">黑體</option><option value="明體">明體</option><option value="圓體">圓體</option>
+                                </select>
+                                <i class="ph-bold ph-caret-down absolute right-3 bottom-2.5 text-gray-400 pointer-events-none text-xs"></i>
                             </div>
                         </div>
 
@@ -360,6 +356,10 @@
                         <h3 class="font-black text-base mb-4 text-gray-800 border-b pb-2 flex items-center gap-2"><i class="ph-fill ph-share-network text-purple-500"></i> 社群與影音連結</h3>
                         <div class="space-y-3">
                             <div class="flex items-center gap-2">
+                                <i class="ph-fill ph-facebook-logo text-gray-400 text-xl w-6"></i>
+                                <input v-model="profile.fbUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="Facebook 連結">
+                            </div>
+                            <div class="flex items-center gap-2">
                                 <i class="ph-fill ph-instagram-logo text-gray-400 text-xl w-6"></i>
                                 <input v-model="profile.igUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="Instagram 連結">
                             </div>
@@ -368,12 +368,8 @@
                                 <input v-model="profile.threadsUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="Threads 連結">
                             </div>
                             <div class="flex items-center gap-2">
-                                <i class="ph-fill ph-facebook-logo text-gray-400 text-xl w-6"></i>
-                                <input v-model="profile.fbUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="Facebook 連結">
-                            </div>
-                            <div class="flex items-center gap-2">
                                 <i class="ph-fill ph-youtube-logo text-gray-400 text-xl w-6"></i>
-                                <input v-model="profile.ytChannelUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="YouTube 頻道連結 (純社群 Icon 導流)">
+                                <input v-model="profile.ytChannelUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="YouTube 頻道連結">
                             </div>
                             <div class="flex items-center gap-2">
                                 <i class="ph-fill ph-tiktok-logo text-gray-400 text-xl w-6"></i>
@@ -395,11 +391,10 @@
                                 <i class="ph-fill ph-podcast text-gray-400 text-xl w-6"></i>
                                 <input v-model="profile.podcastUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="Podcast 連結">
                             </div>
-                            
+
                             <div class="flex items-center gap-2 mt-4 pt-4 border-t border-gray-100">
                                 <i class="ph-fill ph-video-camera text-gray-800 text-2xl w-6"></i>
-                                <input v-model="profile.ytUrl" class="w-full text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="影音預覽框連結 (僅支援YouTube, Vimeo等)">                            
-                            </div>
+                                <input v-model="profile.ytUrl" class="w-full text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="影音連結 (僅支援YouTube,Vimeo等影音平台，不支援雲端硬碟影音檔網址 )">                            </div>
                         </div>
                     </div>
 
@@ -479,13 +474,12 @@
                                     <span class="text-[10px] font-bold text-gray-500 flex items-center gap-1 shrink-0"><i class="ph-fill ph-cursor-click"></i> {{ btn.clicks || 0 }} 點擊</span>
                                     
                                     <div v-if="btn.btnType !== 'image'" class="flex gap-2 shrink-0">
-                                        <div class="relative w-[75px] shrink-0">
-                                            <select v-model="btn.font" class="w-full appearance-none bg-white border border-gray-200 text-gray-600 font-bold px-2 py-1.5 rounded-lg outline-none focus:ring-1 focus:ring-pink-400 text-[10px] cursor-pointer shadow-sm">
+                                        <div class="relative w-[65px] shrink-0">
+                                            <select v-model="btn.font" class="w-full appearance-none bg-white border text-gray-600 font-bold px-2 py-1 rounded-lg outline-none focus:ring-1 focus:ring-pink-400 text-[10px] cursor-pointer shadow-sm">
                                                 <option value="預設字體">字體</option><option value="黑體">黑體</option><option value="明體">明體</option><option value="圓體">圓體</option>
                                             </select>
                                             <i class="ph-bold ph-caret-down absolute right-1.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-[10px]"></i>
                                         </div>
-
                                         <div class="relative">
                                             <button @click.stop="togglePalette('btnText_' + btn.id)" class="text-[10px] font-bold bg-white border px-2 py-1.5 rounded-lg flex items-center gap-1 hover:bg-gray-100 transition" title="按鈕文字色">
                                                 <span class="w-3 h-3 border border-gray-300 rounded-sm" :style="{backgroundColor: btn.textColor || '#000000'}"></span> 字色
@@ -600,7 +594,7 @@
                                     <div class="text-xs font-bold text-gray-500 truncate mr-2">輪播卡片 {{ index + 1 }}</div>
                                     <div class="flex gap-1.5 shrink-0">
                                         <button @click="moveItem(slides, index, -1)" :disabled="index === 0" class="p-1 bg-white border border-gray-200 rounded text-gray-500 disabled:opacity-30 hover:bg-gray-100"><i class="ph ph-arrow-up"></i></button>
-                                        <button @click="moveItem(slides, index, 1)" :disabled="index === slides.length - 1" class="p-1 bg-white border border-gray-200 rounded text-gray-500 disabled:opacity-30 hover:bg-gray-100"><i class="ph ph-arrow-down"></i></button>
+                                        <button @click="moveItem(slides, index, 1)" :disabled="index === slides.length - 1" class="p-1 bg-white border border-gray-200 rounded text-gray-500 disabled:opacity-30 hover:bg-gray-100"><i class="ph-arrow-down"></i></button>
                                         <button @click="insertNewSlide(index)" title="在下方新增空白卡片" class="p-1 bg-blue-50 border border-blue-100 text-blue-500 rounded hover:bg-blue-100 transition"><i class="ph-bold ph-plus"></i></button>
                                         <button @click="requestDelete('slide', slide.id, index, '第 ' + (index + 1) + ' 張輪播圖')" class="p-1 bg-red-50 border border-red-100 text-red-500 rounded hover:bg-red-100"><i class="ph ph-trash"></i></button>
                                     </div>
@@ -740,7 +734,6 @@
   <script>
     const { createApp, ref, onMounted, nextTick } = Vue;
     
-    // 👇👇👇 在此填入你部署好的 GAS 網址 👇👇👇
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwKN7tVF5tnRIIHDGyQ3KElB_BNstGbrWOikDG69EVB-pflciYpVCyVjLStZxpUMQvs/exec";
 
     createApp({
@@ -904,10 +897,11 @@
             }
         };
 
+        // 擴充 profile 內的雙向綁定欄位
         const profile = ref({ 
             avatarUrl: '', name: '', bio: '', bgColor: '#dddddd', bgImageUrl: '', textColor: '#1a1a1a', 
-            socialIconColor: '#000000', fbUrl: '', igUrl: '', lineUrl: '', tiktokUrl: '', ytUrl: '', 
-            wechatUrl: '', threadsUrl: '', whatsappUrl: '', linkedinUrl: '', podcastUrl: '', ytChannelUrl: '',
+            socialIconColor: '#000000', fbUrl: '', igUrl: '', lineUrl: '', tiktokUrl: '', ytUrl: '', wechatUrl: '', 
+            threadsUrl: '', whatsappUrl: '', linkedinUrl: '', podcastUrl: '', ytChannelUrl: '',
             lineToken: '', customUrl: '', titleFont: '預設字體', bioFont: '預設字體'
         });
         const buttons = ref([]);
@@ -951,7 +945,6 @@
 
                 if(pRes.status === 'success' && pRes.data) {
                     profile.value = { ...profile.value, ...pRes.data };
-                    // 為了相容對應的擴充欄位，未來與後端對接後能直接吃到。目前先保留為預設值。
                     if (!profile.value.titleFont) profile.value.titleFont = '預設字體';
                     if (!profile.value.bioFont) profile.value.bioFont = '預設字體';
                 }
@@ -973,7 +966,7 @@
                             type: parsed.type, 
                             linkValue: parsed.value, 
                             textColor: b.textColor || '#000000',
-                            font: b.font || '預設字體', // 針對按鈕的字體擴充
+                            font: b.font || '預設字體',
                             btnType: b.btnType || b['按鈕類型'] || 'button',
                             images: parsedImages,
                             currentImgIdx: 0
@@ -1199,7 +1192,7 @@
                     try {
                         await navigator.clipboard.writeText(res.url);
                     } catch(e) {
-                        prompt("您的公開專屬網址已成功發佈！請複製以下連結：", res.url);
+                        prompt("您的公開專專屬網址已成功發佈！請複製以下連結：", res.url);
                     }
                 } else {
                     showToast('發佈失敗: ' + res.message, 'error');
