@@ -185,7 +185,7 @@
                                     <a v-if="profile.ytChannelUrl" :href="profile.ytChannelUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-youtube-logo text-[28px]"></i></a>
                                     <a v-if="profile.whatsappUrl" :href="profile.whatsappUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-whatsapp-logo text-[28px]"></i></a>
                                     <a v-if="profile.linkedinUrl" :href="profile.linkedinUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-linkedin-logo text-[28px]"></i></a>
-                                    <a v-if="profile.podcastUrl" :href="profile.podcastUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-podcast text-[28px]"></i></a>
+                                    <a v-if="profile.podcastUrl" :href="profile.podcastUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-microphone-stage text-[28px]"></i></a>
                                 </div>
 
                                 <div v-if="profile.ytUrl && getVideoData(profile.ytUrl)" class="relative w-full mt-4 mb-2 rounded-xl overflow-hidden shadow-lg aspect-video bg-black shrink-0 border border-white/20">
@@ -383,7 +383,7 @@
                                 <input v-model="profile.linkedinUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="LinkedIn 連結">
                             </div>
                             <div class="flex items-center gap-2">
-                                <i class="ph-fill ph-podcast text-gray-400 text-xl w-6"></i>
+                                <i class="ph-fill ph-microphone-stage text-gray-400 text-xl w-6"></i>
                                 <input v-model="profile.podcastUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="Podcast 連結">
                             </div>
 
