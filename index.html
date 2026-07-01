@@ -177,7 +177,8 @@
                                 <div class="text-2xl font-black text-center mb-1 tracking-wider" :style="{ color: profile.textColor, fontFamily: getFontFamily(profile.titleFont) }">{{ profile.name || '顯示名稱' }}</div>
                                 <div class="text-[13px] text-center whitespace-pre-wrap leading-relaxed w-full break-words opacity-90" :style="{ color: profile.textColor, fontFamily: getFontFamily(profile.bioFont) }">{{ profile.bio || '尚未填寫自介' }}</div>
 
-                                <div v-if="profile.fbUrl || profile.igUrl || profile.tiktokUrl || profile.threadsUrl || profile.whatsappUrl || profile.linkedinUrl || profile.podcastUrl || profile.wechatUrl || profile.ytChannelUrl" class="flex flex-wrap gap-4 mt-5 mb-2 justify-center items-center">
+                                <!-- 社群 Icon 橫向預覽排版：保留 Podcast 並排除 WeChat -->
+                                <div v-if="profile.fbUrl || profile.igUrl || profile.tiktokUrl || profile.threadsUrl || profile.whatsappUrl || profile.linkedinUrl || profile.podcastUrl || profile.ytChannelUrl" class="flex flex-wrap gap-4 mt-5 mb-2 justify-center items-center">
                                     <a v-if="profile.fbUrl" :href="profile.fbUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-facebook-logo text-[28px]"></i></a>
                                     <a v-if="profile.igUrl" :href="profile.igUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-instagram-logo text-[28px]"></i></a>
                                     <a v-if="profile.threadsUrl" :href="profile.threadsUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-threads-logo text-[28px]"></i></a>
@@ -185,7 +186,6 @@
                                     <a v-if="profile.ytChannelUrl" :href="profile.ytChannelUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-youtube-logo text-[28px]"></i></a>
                                     <a v-if="profile.whatsappUrl" :href="profile.whatsappUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-whatsapp-logo text-[28px]"></i></a>
                                     <a v-if="profile.linkedinUrl" :href="profile.linkedinUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-linkedin-logo text-[28px]"></i></a>
-                                    <a v-if="profile.wechatUrl" :href="profile.wechatUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-wechat-logo text-[28px]"></i></a>
                                     <a v-if="profile.podcastUrl" :href="profile.podcastUrl" target="_blank" class="hover:opacity-80 transition flex items-center justify-center" :style="{ color: profile.socialIconColor }"><i class="ph-fill ph-podcast text-[28px]"></i></a>
                                 </div>
 
@@ -383,10 +383,7 @@
                                 <i class="ph-fill ph-linkedin-logo text-gray-400 text-xl w-6"></i>
                                 <input v-model="profile.linkedinUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="LinkedIn 連結">
                             </div>
-                            <div class="flex items-center gap-2">
-                                <i class="ph-fill ph-wechat-logo text-gray-400 text-xl w-6"></i>
-                                <input v-model="profile.wechatUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="WeChat 連結">
-                            </div>
+                            <!-- WeChat 欄位輸入框已依要求在前端面板完全移除 -->
                             <div class="flex items-center gap-2">
                                 <i class="ph-fill ph-podcast text-gray-400 text-xl w-6"></i>
                                 <input v-model="profile.podcastUrl" class="flex-1 text-xs p-2.5 rounded-lg border bg-gray-50 outline-none focus:ring-1 focus:ring-pink-400" placeholder="Podcast 連結">
@@ -474,12 +471,6 @@
                                     <span class="text-[10px] font-bold text-gray-500 flex items-center gap-1 shrink-0"><i class="ph-fill ph-cursor-click"></i> {{ btn.clicks || 0 }} 點擊</span>
                                     
                                     <div v-if="btn.btnType !== 'image'" class="flex gap-2 shrink-0">
-                                        <div class="relative w-[65px] shrink-0">
-                                            <select v-model="btn.font" class="w-full appearance-none bg-white border text-gray-600 font-bold px-2 py-1 rounded-lg outline-none focus:ring-1 focus:ring-pink-400 text-[10px] cursor-pointer shadow-sm">
-                                                <option value="預設字體">字體</option><option value="黑體">黑體</option><option value="明體">明體</option><option value="圓體">圓體</option>
-                                            </select>
-                                            <i class="ph-bold ph-caret-down absolute right-1.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-[10px]"></i>
-                                        </div>
                                         <div class="relative">
                                             <button @click.stop="togglePalette('btnText_' + btn.id)" class="text-[10px] font-bold bg-white border px-2 py-1.5 rounded-lg flex items-center gap-1 hover:bg-gray-100 transition" title="按鈕文字色">
                                                 <span class="w-3 h-3 border border-gray-300 rounded-sm" :style="{backgroundColor: btn.textColor || '#000000'}"></span> 字色
@@ -641,7 +632,7 @@
                                     <transition name="slide-down">
                                         <div v-if="activePaletteId === 'slideBg_' + slide.id" @click.stop class="mb-3 bg-white p-3 rounded-xl border border-gray-200 shadow-sm relative z-50">
                                             <div class="flex justify-between items-center mb-2"><span class="text-[10px] font-bold text-gray-400">自訂卡片背景色</span><div class="relative w-5 h-5 rounded-full cursor-pointer icolor-wheel border border-gray-200"><input type="color" v-model="slide.bgColor" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"></div></div>
-                                            <div class="color-grid-matrix"><div v-for="(row, rIdx) in colorMatrix" :key="rIdx" class="color-row"><button v-for="c in row" :key="c" @click="slide.bgColor = c" class="color-swatch" :class="{'ring-1 ring-gray-800': slide.bgColor === c}" :style="{ backgroundColor: c }"></button></div></div>
+                                            <div class="color-grid-matrix"><div v-for="(row, rIdx) in colorMatrix" :key="rIdx" class="color-row"><button v-for="c in row" :key="c" @click="slide.bgColor = c" class="color-swatch w-5 h-5" :class="{'ring-1 ring-gray-800': slide.bgColor === c}" :style="{ backgroundColor: c }"></button></div></div>
                                         </div>
                                     </transition>
 
@@ -897,10 +888,10 @@
             }
         };
 
-        // 擴充 profile 內的雙向綁定欄位
+        // 擴充 profile 內的雙向綁定欄位並完全排除 wechatUrl 屬性綁定
         const profile = ref({ 
             avatarUrl: '', name: '', bio: '', bgColor: '#dddddd', bgImageUrl: '', textColor: '#1a1a1a', 
-            socialIconColor: '#000000', fbUrl: '', igUrl: '', lineUrl: '', tiktokUrl: '', ytUrl: '', wechatUrl: '', 
+            socialIconColor: '#000000', fbUrl: '', igUrl: '', lineUrl: '', tiktokUrl: '', ytUrl: '', 
             threadsUrl: '', whatsappUrl: '', linkedinUrl: '', podcastUrl: '', ytChannelUrl: '',
             lineToken: '', customUrl: '', titleFont: '預設字體', bioFont: '預設字體'
         });
@@ -1192,7 +1183,7 @@
                     try {
                         await navigator.clipboard.writeText(res.url);
                     } catch(e) {
-                        prompt("您的公開專專屬網址已成功發佈！請複製以下連結：", res.url);
+                        prompt("您的公開專屬網址已成功發佈！請複製以下連結：", res.url);
                     }
                 } else {
                     showToast('發佈失敗: ' + res.message, 'error');
