@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>RubyBrandDesign 電子名片系統</title>
+  
+  <!-- 網頁分頁 Logo、分享縮圖與手機「加入主畫面」專用 Icon -->
+  <link rel="icon" href="https://drive.google.com/uc?export=view&id=1BQfcrTIFiSpntNeQbsjr_T2oUYgGeGRx" type="image/jpeg">
+  <link rel="apple-touch-icon" href="https://drive.google.com/uc?export=view&id=1BQfcrTIFiSpntNeQbsjr_T2oUYgGeGRx">
+  <meta property="og:image" content="https://drive.google.com/uc?export=view&id=1BQfcrTIFiSpntNeQbsjr_T2oUYgGeGRx">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+TC:wght@400;700;900&family=Noto+Serif+TC:wght@400;700;900&family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
@@ -753,6 +759,17 @@
         const isProfileLinkCopied = ref(false);
         const isPublishingWeb = ref(false);
 
+        // ==========================================
+        // 新增防呆安全鎖檢查函式
+        // ==========================================
+        const checkUnfinishedUploads = () => {
+            const pBase64 = (profile.value.avatarUrl && profile.value.avatarUrl.includes('data:image')) || 
+                            (profile.value.bgImageUrl && profile.value.bgImageUrl.includes('data:image'));
+            const bBase64 = buttons.value.some(b => b.images && b.images.some(img => img.url && img.url.includes('data:image')));
+            const sBase64 = slides.value.some(s => s.imageUrl && s.imageUrl.includes('data:image'));
+            return pBase64 || bBase64 || sBase64;
+        };
+
         const toast = ref({ show: false, message: '', type: 'success' });
         const showToast = (msg, type = 'success') => { 
             toast.value = { show: true, message: msg, type }; 
@@ -1117,7 +1134,15 @@
             }
         };
 
+        // ==========================================
+        // 儲存個人頁資料 (包含安全鎖)
+        // ==========================================
         const saveAllData = async () => {
+            if (checkUnfinishedUploads()) {
+                showToast('圖片正在上傳雲端中，請稍候幾秒再儲存！(若卡住請刪除重傳)', 'error');
+                return;
+            }
+
             isSaving.value = true; 
             activePaletteId.value = null;
             try {
@@ -1141,7 +1166,15 @@
             } finally { if(isSaving.value) isSaving.value = false; }
         };
         
+        // ==========================================
+        // 儲存輪播卡片資料 (包含安全鎖)
+        // ==========================================
         const saveSlidesData = async () => {
+            if (checkUnfinishedUploads()) {
+                showToast('圖片正在上傳雲端中，請稍候幾秒再儲存！(若卡住請刪除重傳)', 'error');
+                return;
+            }
+
             isSaving.value = true; 
             activePaletteId.value = null;
             try {
@@ -1156,7 +1189,15 @@
             } finally { isSaving.value = false; }
         };
 
+        // ==========================================
+        // 發佈公開專屬網頁 (包含安全鎖)
+        // ==========================================
         const publishToWeb = async () => {
+            if (checkUnfinishedUploads()) {
+                showToast('圖片正在上傳雲端中，請稍候幾秒再發佈！(若卡住請刪除重傳)', 'error');
+                return;
+            }
+
             isPublishingWeb.value = true;
             try {
                 if (profile.value.customUrl && !/^[a-zA-Z0-9_-]+$/.test(profile.value.customUrl)) {
@@ -1427,7 +1468,7 @@
           isMediaModalOpen, mediaImages, isLoadingImages, openMediaLibrary, closeMediaLibrary, selectImage,
           handleFileSelect, deleteGalleryImage, isCropModalOpen, isUploading, closeCropper, confirmCropAndUpload,
           isProfileLinkCopied, shareProfilePage, isPublishingWeb, publishToWeb, GAS_API_URL,
-          handleTouchStart, handleTouchEnd, nextImg, prevImg
+          handleTouchStart, handleTouchEnd, nextImg, prevImg, checkUnfinishedUploads
         };
       }
     }).mount('#app');
